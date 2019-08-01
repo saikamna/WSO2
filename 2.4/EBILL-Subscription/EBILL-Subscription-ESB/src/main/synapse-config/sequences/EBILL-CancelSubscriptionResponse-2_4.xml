@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="EBILL-CancelSubscriptionResponse-2_4" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+<payloadFactory media-type="xml">
+    <format>
+      <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+        <soapenv:Header/>
+        <soapenv:Body>
+             $1
+       </soapenv:Body>
+      </soapenv:Envelope>
+    </format>
+    <args>
+      <arg evaluator="xml" expression="get-property('AmendSubscriptionResponse')"/>
+    </args>
+  </payloadFactory>
+  <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="get-property('creditBalanceAdjustment')='true'">
+    <then>
+      <enrich>
+        <source clone="true" type="inline">
+          <creditBalanceAdjustment xmlns="">true</creditBalanceAdjustment>
+        </source>
+        <target action="child" type="body"/>
+      </enrich>
+    </then>
+    <else>
+      <enrich>
+        <source clone="true" type="inline">
+          <creditBalanceAdjustment xmlns="">false</creditBalanceAdjustment>
+        </source>
+        <target action="child" type="body"/>
+      </enrich>
+    </else>
+  </filter>
+  <filter regex="application/json" source="get-property('operation','accept')">
+    <then>
+      <payloadFactory media-type="json">
+        <format>$1</format>
+        <args>
+          <arg evaluator="json" expression="$.subscription"/>
+        </args>
+      </payloadFactory>
+    </then>
+    <else/>
+  </filter>
+  <property description="" name="logText" scope="default" type="STRING" value="EBILL-CancelSubscription-2_4--FinalResponse"/>
+  <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+  <sequence description="" key="gov:sequences/common/1.0/CommonResponse.xml"/>
+</sequence>

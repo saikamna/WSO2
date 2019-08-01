@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="EBILL-CancelSubscriptionIn-2_4" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+ <sequence key="gov:sequences/common/1.0/IncomingRequestLogger.xml"/>
+    <sequence key="gov:sequences/common/1.0/IFWHeader.xml"/>
+    <log level="custom">
+        <property expression="$body/*"
+            name="EBILL-CancelSubscription-Incoming-Request" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </log>
+    <!-- property to store applicationName -->
+    <property name="applicationName" scope="operation" type="STRING" value="value"/>
+    <!-- property to store X-SE-IFW-RequestId -->
+    <property expression="$trp:X-SE-IFW-RequestId" name="requestId"
+        scope="operation" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <!-- property to store X-SE-IFW-EBILLAccessToken -->
+    <property expression="$trp:X-SE-IFW-EBILLAccessToken"
+        name="accessToken" scope="operation" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <!-- property to store X-SE-IFW-CountryCode -->
+    <property expression="$trp:X-SE-IFW-CountryCode" name="countryCode"
+        scope="operation" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <!-- property to store X-SE-IFW-LanguageCode -->
+    <property expression="$trp:X-SE-IFW-LanguageCode"
+        name="languageCode" scope="operation" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <!-- property to store Content-Type -->
+    <property expression="$trp:Content-Type" name="contentType"
+        scope="operation" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <!-- checking for contentType (application/xml or application/json) -->
+    <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="get-property('operation','contentType') = 'application/json'">
+        <then>
+            <payloadFactory media-type="xml">
+                <format>
+                    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+                        <soapenv:Header/>
+                        <soapenv:Body>
+                            <subscription xmlns="">$1</subscription>
+                        </soapenv:Body>
+                    </soapenv:Envelope>
+                </format>
+                <args>
+                    <arg evaluator="json" expression="$" literal="false"/>
+                </args>
+            </payloadFactory>
+            <property name="messageType" scope="axis2" type="STRING" value="text/xml"/>
+            <property name="ContentType" scope="axis2" type="STRING" value="text/xml"/>
+            <property name="logText" scope="default" type="STRING" value="JSON-To-XML-Converted-Request"/>
+            <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+        </then>
+        <else/>
+    </filter>
+    <!-- storing invoiceAmount -->
+    <property expression="//*[local-name()='invoiceAmount']/text()"
+        name="invoiceAmount" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <!-- storing invoiceId -->
+    <property expression="//*[local-name()='invoiceId']/text()"
+        name="invoiceId" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <!-- storing comment -->
+    <property expression="//*[local-name()='description']/text()"
+        name="comment" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property name="creditBalanceAdjustment" scope="default"
+        type="STRING" value="false"/>
+    <!-- token confg file -->
+    <property
+        expression="get-property('EBILL-CancelSubscriptionConfig')"
+        name="proxyConfig" scope="default" type="OM" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property action="remove" name="REST_URL_POSTFIX" scope="axis2"/>
+    <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+    <!-- xslt to tranform the request -->
+    <xslt key="gov:xslts/EBILL-Subscription/2.4/AmendSubscription_RequestforCancel.xslt">
+        <property
+            expression="$ctx:proxyConfig//*[local-name()='triggerEvent']"
+            name="triggerEvent" xmlns:ns="http://org.apache.synapse/xsd"/>
+        <property
+            expression="$ctx:proxyConfig//*[local-name()='callbackURL']"
+            name="callbackURL" xmlns:ns="http://org.apache.synapse/xsd"/>
+        <property
+            expression="$ctx:proxyConfig//*[local-name()='amendType']"
+            name="amendType" xmlns:ns="http://org.apache.synapse/xsd"/>
+        <property expression="get-property('operation','accessToken')"
+            name="accessToken" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </xslt>
+    <property name="messageType" scope="axis2" type="STRING" value="application/xml"/>
+    <property name="ContentType" scope="axis2" type="STRING" value="application/xml"/>
+    <!-- token-config file -->
+    <property expression="get-property('OAuth-TokenConfig')"
+        name="tokenConfig" scope="default" type="OM" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property expression="$ctx:tokenConfig//*[local-name()='OAuth']"
+        name="OAuthToken" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property expression="concat('Bearer ',$ctx:OAuthToken)"
+        name="Authorization" scope="transport" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property
+        expression="get-property('EBILL-CancelSubscription-2_4_Config')"
+        name="cancelSubscriptionConfig" scope="default" type="OM" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <!-- config file with endpoint -->
+    <property
+        expression="$ctx:cancelSubscriptionConfig//*[local-name()='value']/text()"
+        name="uri.var.serviceName" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property action="remove" name="Content-Encoding" scope="transport"/>
+    <property expression="get-property('requestId')"
+        name="X-SE-IFW-RequestId" scope="transport" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property name="FORCE_ERROR_ON_SOAP_FAULT" scope="default"
+        type="STRING" value="true"/>
+    <property name="HTTP_METHOD" scope="axis2" type="STRING" value="PUT"/>
+    <header name="NO_KEEPALIVE" scope="transport" value="true"/>
+    <log level="custom">
+        <property expression="$body/*"
+            name="Amend-Susbcriptions-Request" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </log>
+    <!-- calling endpoint -->
+    <call>
+        <endpoint key="APIM_REST_Endpoint"/>
+    </call>
+    <log level="custom">
+        <property expression="$body/*"
+            name="Amend-Susbcriptions-Response" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </log>
+    <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+    <property expression="$axis2:HTTP_SC" name="httpStatusCode"
+        scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property expression="//*[local-name()='invoiceId']/text()"
+        name="invoiceIdFromResponse" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property expression="//*[local-name()='errorCode']"
+        name="errorMessage" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property expression="//*[local-name()='Fault']" name="Fault"
+        scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property expression="//*[local-name()='subscription']"
+        name="susbcriptionFromResponse" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <!-- checking for fault -->
+    <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="string-length(get-property('Fault'))!=0">
+        <then>
+            <filter regex="application/json" source="get-property('operation','accept')">
+                <then>
+                    <property name="messageType" scope="axis2"
+                        type="STRING" value="application/json"/>
+                    <property name="ContentType" scope="axis2"
+                        type="STRING" value="application/json"/>
+                </then>
+                <else>
+                    <property name="messageType" scope="axis2"
+                        type="STRING" value="application/xml"/>
+                    <property name="ContentType" scope="axis2"
+                        type="STRING" value="application/xml"/>
+                </else>
+            </filter>
+            <respond/>
+        </then>
+        <else/>
+    </filter>
+    <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="string-length(get-property('susbcriptionFromResponse'))!=0">
+        <then>
+            <property expression="//*[local-name()='subscription']"
+                name="AmendSubscriptionResponse" scope="default" type="OM"/>
+        </then>
+        <else/>
+    </filter>
+    <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="string-length(get-property('invoiceIdFromResponse'))=0.0">
+        <then>
+            <filter xpath="string-length(get-property('susbcriptionFromResponse'))!=0">
+                <then>
+                    <sequence key="EBILL-CancelSubscriptionResponse-2_4"/>
+                </then>
+                <else>
+                    <property name="logText" scope="default"
+                        type="STRING" value="Executing-Fault-From-Amend-Subscription"/>
+                    <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+                    <sequence key="EBILL-CancelSubscriptionFault-2_4"/>
+                </else>
+            </filter>
+        </then>
+        <else/>
+    </filter>
+    <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="string-length(get-property('invoiceId'))=0.0 or string-length(get-property('invoiceAmount'))=0.0">
+        <then>
+            <sequence key="EBILL-CancelSubscriptionResponse-2_4"/>
+        </then>
+        <else/>
+    </filter>
+    <!-- storing invoiceId -->
+    <property expression="get-property('invoiceId')" name="invoiceId"
+        scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <!-- storing invoiceAmount -->
+    <property expression="get-property('invoiceAmount')"
+        name="invoiceAmount" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <!-- token Config -->
+    <property expression="get-property('ZuoraRest-TokenConfig')"
+        name="tokenConfig" scope="default" type="OM" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property expression="$ctx:tokenConfig//*[local-name()='userName']"
+        name="apiAccessKeyId" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property expression="$ctx:tokenConfig//*[local-name()='password']"
+        name="apiSecretAccessKey" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property
+        expression="$ctx:tokenConfig//*[local-name()='apiVersion']"
+        name="uri.var.zuora.apiVersion" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property expression="$ctx:tokenConfig//*[local-name()='apiUrl']"
+        name="uri.var.zuora.apiUrl" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="string-length(get-property('operation','accessToken'))=0.0">
+        <then>
+            <header expression="get-property('apiAccessKeyId')"
+                name="apiAccessKeyId" scope="transport"/>
+            <header expression="get-property('apiSecretAccessKey')"
+                name="apiSecretAccessKey" scope="transport"/>
+            <property name="Accept" scope="axis2" type="STRING" value="application/json"/>
+            <property name="logText" scope="default" type="STRING" value="Call-To-Get-Zuora-Session-Cookie"/>
+            <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+            <call>
+        <endpoint>
+          <http method="post" trace="disable" uri-template="{+uri.var.zuora.apiUrl}/{+uri.var.zuora.apiVersion}/connections"/>
+        </endpoint>
+      </call>
+            <property name="logText" scope="default" type="STRING" value="Response-From-Get-Zuora-Session-Cookie"/>
+            <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+            <property expression="$axis2:HTTP_SC" name="httpStatusCode"
+                scope="default" type="STRING"/>
+            <property name="messageType" scope="axis2" type="STRING" value="application/xml"/>
+            <property name="ContentType" scope="axis2" type="STRING" value="application/xml"/>
+            <filter xpath="get-property('httpStatusCode')!='200'">
+                <then>
+                    <log level="custom">
+                        <property expression="$body/*" name="Executing-Fault-After-Get-Zuora-Session-Cookie-Response"/>
+                    </log>
+                    <sequence key="EBILL-CancelSubscriptionFault-2_4"/>
+                </then>
+                <else/>
+            </filter>
+        </then>
+        <else>
+            <header
+                expression="fn:concat('ZSession=',get-property('operation','accessToken'))"
+                name="Set-Cookie" scope="transport"/>
+        </else>
+    </filter>
+    <property expression="$trp:Set-Cookie" name="setCookieHeader"
+        scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <header action="remove" name="Set-Cookie" scope="transport"/>
+    <payloadFactory media-type="json">
+        <format>
+ {
+   "objects":[
+      {
+         "Type":"Increase",
+         "Comment":"$1",
+         "ReasonCode":"Cancellation",
+         "SourceTransactionId":"$2",
+         "Amount":"$3"
+      }
+   ],
+   "type":"CreditBalanceAdjustment"
+}
+      </format>
+        <args>
+            <arg evaluator="xml" expression="get-property('comment')"
+                literal="false" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <arg evaluator="xml"
+                expression="get-property('invoiceIdFromResponse')"
+                literal="false" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <arg evaluator="xml"
+                expression="get-property('invoiceAmount')"
+                literal="false" xmlns:ns="http://org.apache.synapse/xsd"/>
+        </args>
+    </payloadFactory>
+    <property expression="$ctx:setCookieHeader" name="Cookie"
+        scope="transport" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <log level="custom">
+        <property expression="$body/*"
+            name="Zuora-CreditBalanceAdjustment-Increment-Call-Request" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </log>
+    <call>
+    <endpoint>
+      <http method="post" trace="disable" uri-template="{+uri.var.zuora.apiUrl}/{+uri.var.zuora.apiVersion}/action/create"/>
+    </endpoint>
+  </call>
+    <log level="custom">
+        <property expression="$body/*"
+            name="Zuora-CreditBalanceAdjustment-Increment-Call-Response" xmlns:ns="http://org.apache.synapse/xsd"/>
+    </log>
+    <property expression="$axis2:HTTP_SC" name="httpStatusCode"
+        scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property name="messageType" scope="axis2" type="STRING" value="application/xml"/>
+    <property name="ContentType" scope="axis2" type="STRING" value="application/xml"/>
+    <property expression="//*[local-name()='Errors']" name="Errors"
+        scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="get-property('httpStatusCode')!='200' or string-length(get-property('Errors'))!=0">
+        <then>
+            <log level="custom">
+                <property expression="$body/*" name="Executing-Fault-After-Zuora-CreditBalanceAdjustment-Increment-Response"/>
+            </log>
+            <sequence key="EBILL-CancelSubscriptionFault-2_4"/>
+        </then>
+        <else/>
+    </filter>
+    <payloadFactory media-type="json">
+        <format>
+ {
+   "objects":[
+      {
+         "Type":"Decrease",
+         "Comment":"$1",
+         "ReasonCode":"Cancellation",
+         "SourceTransactionId":"$2",
+         "Amount":"$3"
+      }
+   ],
+   "type":"CreditBalanceAdjustment"
+}
+      </format>
+        <args>
+            <arg evaluator="xml" expression="get-property('comment')"
+                literal="false" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <arg evaluator="xml" expression="get-property('invoiceId')"
+                literal="false" xmlns:ns="http://org.apache.synapse/xsd"/>
+            <arg evaluator="xml"
+                expression="get-property('invoiceAmount')"
+                literal="false" xmlns:ns="http://org.apache.synapse/xsd"/>
+        </args>
+    </payloadFactory>
+    <property expression="$ctx:setCookieHeader" name="Cookie"
+        scope="transport" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property name="logText" scope="default" type="STRING" value="Zuora-CreditBalanceAdjustment-Decrement-Call-Request"/>
+    <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+    <call>
+    <endpoint>
+      <http method="post" trace="disable" uri-template="{+uri.var.zuora.apiUrl}/{+uri.var.zuora.apiVersion}/action/create"/>
+    </endpoint>
+  </call>
+    <property name="logText" scope="default" type="STRING" value="Zuora-CreditBalanceAdjustment-Decrement-Call-Response"/>
+    <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+    <property expression="$axis2:HTTP_SC" name="httpStatusCode"
+        scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <property name="messageType" scope="axis2" type="STRING" value="application/xml"/>
+    <property name="ContentType" scope="axis2" type="STRING" value="application/xml"/>
+    <property expression="//*[local-name()='Errors']" name="Errors"
+        scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+    <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="get-property('httpStatusCode')!='200' or string-length(get-property('Errors'))!=0">
+        <then>
+            <property name="logText" scope="default" type="STRING" value="Executing-Fault-After-Zuora-CreditBalanceAdjustment-Decrement-Response"/>
+            <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+            <sequence key="EBILL-CancelSubscriptionFault-2_4"/>
+        </then>
+        <else/>
+    </filter>
+    <property name="creditBalanceAdjustment" scope="default"
+        type="STRING" value="true"/>
+    <sequence key="EBILL-CancelSubscriptionResponse-2_4"/>
+</sequence>

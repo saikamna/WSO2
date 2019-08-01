@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="EBILL-GetSubscriptionsByKeysIn-2_4" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+ <!-- This sequence get subscriptions By Keys in ebill -->
+  <!-- This sequence is called by an API - EBILL-Subscription.xml -->
+  <!-- This sequence will call fault sequence in case of any fault- EBILL-GetSubscriptionsByKeysFault-2_4 -->
+  <sequence key="gov:sequences/common/1.0/IncomingRequestLogger.xml"/>
+  <!-- property to store accept type -->
+  <property expression="$trp:Accept" name="accept" scope="operation"
+    type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+  <header expression="get-property('operation','correlationId')"
+    name="X-SE-IFW-RequestId" scope="transport"/>
+  <sequence key="gov:sequences/common/1.0/IFWHeader.xml"/>
+  <property expression="get-property('operation','incomingRequest')"
+    name="request" scope="default" type="OM" xmlns:ns="http://org.apache.synapse/xsd"/>
+  <!-- token-config -->
+  <property expression="get-property('Zuora-TokenConfig')"
+    name="tokenConfig" scope="default" type="OM"/>
+  <!-- property to store hostName -->
+  <property expression="$ctx:tokenConfig//*[local-name()='hostName']"
+    name="hostName" scope="default" type="STRING"/>
+  <!-- property to store userName -->
+  <property expression="$ctx:tokenConfig//*[local-name()='userName']"
+    name="userName" scope="default" type="STRING"/>
+  <!-- property to store password -->
+  <property expression="$ctx:tokenConfig//*[local-name()='password']"
+    name="password" scope="default" type="STRING"/>
+  <!-- property to store X-SE-IFW-EBILLAccessToken -->
+  <property expression="$trp:X-SE-IFW-EBILLAccessToken"
+    name="accessToken" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+  <!-- property to store batchSize -->
+  <property expression="$ctx:request//*[local-name()='batchSize']"
+    name="batchSize" scope="default" type="STRING"/>
+  <!-- property to store queryId -->
+  <property expression="$ctx:request//*[local-name()='queryId']"
+    name="queryId" scope="default" type="STRING"/>
+  <!-- property to store pageNumber -->
+  <property expression="$ctx:request//*[local-name()='pageNumber']"
+    name="pageNumber" scope="default" type="STRING"/>
+  <property
+    expression="(number(get-property('pageNumber'))-1)*(number(get-property('batchSize')))"
+    name="batchvalue" scope="default" type="STRING"/>
+  <xslt key="gov:xslts/EBILL-Subscription/2.4/getSubscriptionsBykeys_Mandatory.xslt"/>
+  <log level="custom">
+    <property expression="$body/*" name="EBILL-getSubscriptionsBykeys-2_4_ValidatedRequest"/>
+  </log>
+  <!-- property to store the fault descripton coming from getSubscriptionsBykeys_Mandatory XSLT -->
+  <property expression="//faultdescription/text()" name="faultdescription"
+    scope="default" type="STRING"/>
+  <!-- Filter to check the whether we got any fault from  getSubscriptionsBykeys_Mandatory XSLT(If request body is invalid this xslt will form fault description)-->
+  <!-- checking for queryId -->
+  <filter xpath="string-length(get-property('faultdescription')) != 0">
+    <then>
+      <xslt key="gov:xslts/common/1.0/businessError.xslt">
+        <property name="code" value="BAD_REQUEST"/>
+        <property
+          expression="concat('Invalid Input : ',$ctx:faultdescription)" name="description"/>
+        <property name="type" value="business"/>
+        <property name="source" value="IFW"/>
+      </xslt>
+      <property name="HTTP_SC" scope="axis2" type="INTEGER" value="400"/>
+      <sequence key="gov:sequences/common/2.0/CommonFault-2_0.xml"/>
+    </then>
+    <else>
+      <filter xpath="string-length(get-property('queryId'))=0.0">
+        <then>
+          <!-- xslt to transform the request -->
+          <xslt key="gov:xslts/EBILL-Subscription/2.4/QueryId_Request.xslt"/>
+          <property
+            expression="substring(//api:queryString,0,string-length(//api:queryString)-3)"
+            name="queryString" scope="default" type="STRING" xmlns:api="http://api.zuora.com/"/>
+          <!-- checking if access token is passed -->
+          <filter xpath="string-length(get-property('accessToken')) = 0">
+            <then>
+              <zuorasoap.init>
+                <apiUrl>{$ctx:hostName}</apiUrl>
+                <username>{$ctx:userName}</username>
+                <password>{$ctx:password}</password>
+                <blocking>no</blocking>
+              </zuorasoap.init>
+              <log level="custom" separator="******Token_Generation*******"/>
+              <zuorasoap.query>
+                <queryString>{$ctx:queryString}</queryString>
+                <batchSize>{$ctx:batchSize}</batchSize>
+              </zuorasoap.query>
+              <property
+                expression="substring-before(//ns1:queryResponse/ns1:result/ns1:queryLocator,'-')"
+                name="id" scope="default" type="STRING" xmlns:ns1="http://api.zuora.com/"/>
+              <log level="custom">
+                <property name="logText" value="Query-Response"/>
+                <property expression="//ns1:result" name="log" xmlns:ns1="http://api.zuora.com/"/>
+              </log>
+              <filter xpath="get-property('batchvalue') > 0 and string-length(get-property('id'))!=0">
+                <then>
+                  <property
+                    expression="concat(get-property('id'),'-',(number(get-property('pageNumber'))-1)*(number(get-property('batchSize'))))"
+                    name="zuorasoap.query.queryLocator" scope="default" type="STRING"/>
+                  <log level="custom">
+                    <property name="LogText" value="QueryMore-QueryLocator"/>
+                    <property
+                      expression="get-property('zuorasoap.query.queryLocator')" name="Queryloc"/>
+                  </log>
+                  <zuorasoap.queryMore>
+                    <batchSize>{$ctx:batchSize}</batchSize>
+                  </zuorasoap.queryMore>
+                </then>
+                <else/>
+              </filter>
+            </then>
+            <else>
+              <property expression="get-property('accessToken')"
+                name="zuorasoap.sessionId" scope="default" type="STRING" xmlns:api="http://api.zuora.com/"/>
+              <property expression="$ctx:hostName"
+                name="uri.var.zuorasoap.apiUrl" scope="default" type="STRING"/>
+              <zuorasoap.query>
+                <queryString>{$ctx:queryString}</queryString>
+                <batchSize>{$ctx:batchSize}</batchSize>
+              </zuorasoap.query>
+              <property
+                expression="substring-before(//ns1:queryResponse/ns1:result/ns1:queryLocator,'-')"
+                name="id" scope="default" type="STRING" xmlns:ns1="http://api.zuora.com/"/>
+              <log level="custom">
+                <property name="logText" value="Query-Response"/>
+                <property expression="//ns1:result" name="log" xmlns:ns1="http://api.zuora.com/"/>
+              </log>
+              <filter xpath="get-property('batchvalue') > 0 and string-length(get-property('id'))!=0">
+                <then>
+                  <property
+                    expression="concat(get-property('id'),'-',(number(get-property('pageNumber'))-1)*(number(get-property('batchSize'))))"
+                    name="zuorasoap.query.queryLocator" scope="default" type="STRING"/>
+                  <log level="custom">
+                    <property name="LogText" value="QueryMore-QueryLocator"/>
+                    <property
+                      expression="get-property('zuorasoap.query.queryLocator')" name="Queryloc"/>
+                  </log>
+                  <zuorasoap.queryMore>
+                    <batchSize>{$ctx:batchSize}</batchSize>
+                  </zuorasoap.queryMore>
+                </then>
+                <else/>
+              </filter>
+            </else>
+          </filter>
+          <property name="logText" scope="default" type="STRING" value="Query-Response"/>
+          <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+          <filter
+            xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xpath="//soapenv:Fault">
+            <then>
+              <sequence key="EBILL-GetSubscriptionsByKeysFault-2_4"/>
+            </then>
+            <else>
+              <enrich>
+                <source clone="true" property="request" type="property"/>
+                <target action="child" type="body"/>
+              </enrich>
+              <xslt key="gov:xslts/EBILL-Subscription/2.4/GetSubscriptionsByKeys_Response.xslt"/>
+            </else>
+          </filter>
+        </then>
+        <else>
+          <!-- checking if access token is passed -->
+          <filter xpath="string-length(get-property('accessToken')) = 0">
+            <then>
+              <zuorasoap.init>
+                <apiUrl>{$ctx:hostName}</apiUrl>
+                <username>{$ctx:userName}</username>
+                <password>{$ctx:password}</password>
+                <blocking>no</blocking>
+              </zuorasoap.init>
+              <log level="custom" separator="******Token_Generation*******"/>
+              <property
+                expression="//ns1:loginResponse/ns1:result/ns1:Session"
+                name="ZuoraSessionId" scope="default" type="STRING" xmlns:ns1="http://api.zuora.com/"/>
+              <enrich>
+                <source clone="true" property="request" type="property"/>
+                <target action="child" type="body"/>
+              </enrich>
+              <property
+                expression="concat(get-property('queryId'),'-',(number(get-property('pageNumber'))-1)*(number(get-property('batchSize'))))"
+                name="Query" scope="default" type="STRING"/>
+              <payloadFactory media-type="xml">
+                <format>
+                  <soapenv:Envelope
+                    xmlns:ord="http://soap.sforce.com/schemas/class/orderResponseHandler" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+                    <soapenv:Header/>
+                    <soapenv:Body>
+                      <soapenv:Envelope xmlns:api="http://api.zuora.com/">
+                        <soapenv:Header>
+                          <api:SessionHeader>
+                            <api:session>$1</api:session>
+                          </api:SessionHeader>
+                          <api:QueryOptions>
+                            <api:batchSize>$2</api:batchSize>
+                          </api:QueryOptions>
+                        </soapenv:Header>
+                        <soapenv:Body>
+                          <api:queryMore>
+                            <api:queryLocator>$3</api:queryLocator>
+                          </api:queryMore>
+                        </soapenv:Body>
+                      </soapenv:Envelope>
+                    </soapenv:Body>
+                  </soapenv:Envelope>
+                </format>
+                <args>
+                  <arg evaluator="xml"
+                    expression="get-property('ZuoraSessionId')" xmlns:ns="http://org.apache.synapse/xsd"/>
+                  <arg evaluator="xml"
+                    expression="get-property('batchSize')" xmlns:ns="http://org.apache.synapse/xsd"/>
+                  <arg evaluator="xml"
+                    expression="get-property('Query')" xmlns:ns="http://org.apache.synapse/xsd"/>
+                </args>
+              </payloadFactory>
+              <property name="logText" scope="default" type="STRING" value="QueryId-QueryMoreRequest"/>
+              <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+              <property name="ContentType" scope="axis2" type="STRING" value="text/xml"/>
+              <property name="SOAPAction" scope="transport"
+                type="STRING" value=""/>
+              <header name="HTTP_METHOD" scope="transport" value="POST"/>
+              <header name="NO_KEEPALIVE" scope="transport" value="true"/>
+              <call>
+                <endpoint key="ZuoraSoapEndpoint"/>
+              </call>
+              <log level="custom">
+                <property expression="$body/*" name="QueryId-Response"/>
+              </log>
+              <filter
+                xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xpath="//soapenv:Fault">
+                <then>
+                  <sequence key="EBILL-GetSubscriptionsByKeysFault-2_4"/>
+                </then>
+                <else>
+                  <enrich>
+                    <source clone="true" property="request" type="property"/>
+                    <target action="child" type="body"/>
+                  </enrich>
+                  <xslt key="gov:xslts/EBILL-Subscription/2.4/GetSubscriptionsByKeys_Response.xslt"/>
+                </else>
+              </filter>
+            </then>
+            <else>
+              <property expression="$ctx:hostName"
+                name="uri.var.zuorasoap.apiUrl" scope="default" type="STRING"/>
+              <enrich>
+                <source clone="true" property="request" type="property"/>
+                <target action="child" type="body"/>
+              </enrich>
+              <property
+                expression="concat(get-property('queryId'),'-',(number(get-property('pageNumber'))-1)*(number(get-property('batchSize'))))"
+                name="Query" scope="default" type="STRING"/>
+              <payloadFactory media-type="xml">
+                <format>
+                  <soapenv:Envelope
+                    xmlns:ord="http://soap.sforce.com/schemas/class/orderResponseHandler" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+                    <soapenv:Header/>
+                    <soapenv:Body>
+                      <soapenv:Envelope xmlns:api="http://api.zuora.com/">
+                        <soapenv:Header>
+                          <api:SessionHeader>
+                            <api:session>$1</api:session>
+                          </api:SessionHeader>
+                          <api:QueryOptions>
+                            <api:batchSize>$2</api:batchSize>
+                          </api:QueryOptions>
+                        </soapenv:Header>
+                        <soapenv:Body>
+                          <api:queryMore>
+                            <api:queryLocator>$3</api:queryLocator>
+                          </api:queryMore>
+                        </soapenv:Body>
+                      </soapenv:Envelope>
+                    </soapenv:Body>
+                  </soapenv:Envelope>
+                </format>
+                <args>
+                  <arg evaluator="xml"
+                    expression="get-property('accessToken')" xmlns:ns="http://org.apache.synapse/xsd"/>
+                  <arg evaluator="xml"
+                    expression="get-property('batchSize')" xmlns:ns="http://org.apache.synapse/xsd"/>
+                  <arg evaluator="xml"
+                    expression="get-property('Query')" xmlns:ns="http://org.apache.synapse/xsd"/>
+                </args>
+              </payloadFactory>
+              <log level="custom">
+                <property expression="$body/*" name="QueryId-QueryMoreRequest"/>
+              </log>
+              <property
+                expression="//ns1:loginResponse/ns1:result/ns1:Session"
+                name="zuorasoap.sessionId" scope="default" type="STRING" xmlns:ns1="http://api.zuora.com/"/>
+              <property name="ContentType" scope="axis2" type="STRING" value="text/xml"/>
+              <property name="SOAPAction" scope="transport"
+                type="STRING" value=""/>
+              <header name="HTTP_METHOD" scope="transport" value="POST"/>
+              <header name="NO_KEEPALIVE" scope="transport" value="true"/>
+              <call>
+                <endpoint key="ZuoraSoapEndpoint"/>
+              </call>
+              <log level="custom">
+                <property expression="$body/*" name="QueryId-Response"/>
+              </log>
+              <filter
+                xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xpath="//soapenv:Fault">
+                <then>
+                  <sequence key="EBILL-GetSubscriptionsByKeysFault-2_4"/>
+                </then>
+                <else>
+                  <enrich>
+                    <source clone="true" property="request" type="property"/>
+                    <target action="child" type="body"/>
+                  </enrich>
+                  <xslt key="gov:xslts/EBILL-Subscription/2.4/GetSubscriptionsByKeys_Response.xslt"/>
+                </else>
+              </filter>
+            </else>
+          </filter>
+        </else>
+      </filter>
+      <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="get-property('operation','accept') = 'application/json'">
+        <then>
+          <filter xpath="//subscriptions">
+            <then>
+              <payloadFactory media-type="json">
+                <format>$1</format>
+                <args>
+                  <arg evaluator="json" expression="$.subscriptions"/>
+                </args>
+              </payloadFactory>
+            </then>
+            <else/>
+          </filter>
+        </then>
+        <else/>
+      </filter>
+      <property
+        expression="fn:concat($ctx:proxy.name,' Final-Response')"
+        name="logText" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+      <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+      <sequence key="gov:sequences/common/1.0/CommonResponse.xml"/>
+    </else>
+  </filter>
+</sequence>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="EBILL-GetSubscriptionDetailsIn-2_4" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+ <sequence key="gov:sequences/common/1.0/IncomingRequestLogger.xml"/>
+  <sequence key="gov:sequences/common/1.0/IFWHeader.xml"/>
+  <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+  <property expression="get-property('query.param.subscription-key')"
+    name="subscriptionKey" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+  <property expression="get-property('query.param.ratePlans')"
+    name="rateplan" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+  <property expression="//subscriptionProductFeatures"
+    name="subscriptionProductFeatures" scope="operation" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+  <property
+    expression="get-property('query.param.subscriptionProductFeatures')"
+    name="subscriptionProductFeatures1" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+  <filter xpath="(string-length(get-property('subscriptionProductFeatures1'))!=0 and string-length(get-property('rateplan'))!=0) and (get-property('rateplan')='true' or get-property('rateplan')='false') and (get-property('subscriptionProductFeatures1')='true' or get-property('subscriptionProductFeatures1')='false')">
+    <then>
+      <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="get-property('subscriptionKey')">
+        <then>
+          <filter xpath="string-length(get-property('subscriptionKey'))!=0 and get-property('subscriptionKey')!='?'">
+            <then>
+              <property
+                expression="get-property('ZuoraRest-TokenConfig')"
+                name="tokenConfig" scope="default" type="OM"/>
+              <property
+                expression="$ctx:tokenConfig//*[local-name()='hostName']"
+                name="hostName" scope="default" type="STRING"/>
+              <property
+                expression="$ctx:tokenConfig//*[local-name()='userName']"
+                name="userName" scope="default" type="STRING"/>
+              <property
+                expression="$ctx:tokenConfig//*[local-name()='password']"
+                name="password" scope="default" type="STRING"/>
+              <zuora.init>
+                <apiUrl>{$ctx:hostName}</apiUrl>
+                <apiAccessKeyId>{$ctx:userName}</apiAccessKeyId>
+                <apiSecretAccessKey>{$ctx:password}</apiSecretAccessKey>
+                <blocking>no</blocking>
+              </zuora.init>
+              <zuora.getSubscriptionsByKey>
+                <subscriptionKey>{$ctx:subscriptionKey}</subscriptionKey>
+              </zuora.getSubscriptionsByKey>
+              <property name="logText" scope="default" type="STRING" value="GetSubscriptionByKeyResponse"/>
+              <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+              <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+              <filter xpath="//success='true'">
+                <then>
+                  <filter xpath="((get-property('operation','subscriptionProductFeatures')='true') or $ctx:rateplan='true')">
+                    <then>
+                      <filter xpath=" ( $ctx:rateplan='true' and count(//ratePlans)=0.0)">
+                        <then>
+                          <xslt key="gov:xslts/EBILL-Subscription/2.4/GetSubscriptionDetails_BusinessFault.xslt">
+                            <property name="faultCode" value="RATEPLANS_NOT_FOUND"/>
+                            <property
+                              expression="get-property('operation','InputSubscriptionKey')" name="subscriptionKey"/>
+                          </xslt>
+                          <sequence key="EBILL-GetSubscriptionDetailsFault-2_4"/>
+                        </then>
+                        <else>
+                          <xslt key="gov:xslts/EBILL-Subscription/2.4/GetSubscriptionDetails_WithRatePlans_Response.xslt">
+                            <property
+                              expression="get-property(&quot;SYSTEM_DATE&quot;, &quot;yyyy-MM-dd &quot;)" name="currentDate"/>
+                          </xslt>
+                          <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+                        </else>
+                      </filter>
+                    </then>
+                    <else>
+                      <xslt key="gov:xslts/EBILL-Subscription/2.4/GetSubscriptionDetails_Response.xslt">
+                        <property
+                          expression="get-property(&quot;SYSTEM_DATE&quot;, &quot;yyyy-MM-dd &quot;)" name="currentDate"/>
+                      </xslt>
+                      <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+                    </else>
+                  </filter>
+                </then>
+                <else>
+                  <xslt key="gov:xslts/EBILL-Subscription/2.4/GetSubscriptionDetails_BusinessFault.xslt">
+                    <property name="faultCode" value="SUBSCRIPTION_NOT_FOUND"/>
+                    <property
+                      expression="get-property('subscriptionKey')" name="subKey"/>
+                  </xslt>
+                  <sequence key="EBILL-GetSubscriptionDetailsFault-2_4"/>
+                </else>
+              </filter>
+              <property
+                expression="fn:concat($ctx:proxy.name,' Final-Response')"
+                name="logText" scope="default" type="STRING"/>
+              <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+              <sequence key="gov:sequences/common/1.0/CommonResponse.xml"/>
+            </then>
+            <else>
+              <xslt key="gov:xslts/EBILL-Subscription/2.4/GetSubscriptionDetails_BusinessFault.xslt">
+                <property name="faultCode" value="SUBSCRIPTION_NOT_FOUND"/>
+                <property expression="get-property('subscriptionKey')" name="subKey"/>
+              </xslt>
+              <sequence key="EBILL-GetSubscriptionDetailsFault-2_4"/>
+            </else>
+          </filter>
+        </then>
+        <else>
+          <property name="ERROR_CODE" scope="default" type="STRING" value="SUBSCRIPTIONKEY_NOT_FOUND"/>
+          <property name="ERROR_MESSAGE" scope="default" type="STRING" value="SubscriptionKey is not found"/>
+          <sequence key="EBILL-GetSubscriptionDetailsFault-2_4"/>
+        </else>
+      </filter>
+    </then>
+    <else>
+      <property name="ERROR_CODE" scope="default" type="STRING" value="BAD_REQUEST"/>
+      <property name="ERROR_MESSAGE" scope="default" type="STRING" value="Query parameters needs to be boolean value"/>
+      <property name="SOURCE_SYSTEM" scope="default" type="STRING" value="IFW"/>
+      <sequence key="EBILL-GetSubscriptionDetailsFault-2_4"/>
+    </else>
+  </filter>
+</sequence>

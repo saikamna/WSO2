@@ -1,0 +1,32 @@
+{
+	"Deploy": {
+		"ESB": "true",
+		"APIM": "false"
+	},
+	"Region": [
+		"DEV"
+	],
+	"Rollback": "true",
+	"APIName": "EBILL-Subscription",
+	"Version": "2.4",
+	"Artifacts": {
+		"ESB": "EBILL-Subscription-ReleaseBundle-2.4.13.zip",
+		"APIM": "EBILL-Subscription-2.4.TAR"
+	},
+	"ESBDependencies": {
+		"File": [
+			{
+				"Name": "EBILL-Subscription-CAR-2.4.13.car",
+				"Type": "CAR"
+			},
+			{
+			    "Name": "EBILL-CancelSubscription-2_4_Config.xml",
+				"Type": "LocalEntry"
+			},
+			{
+			    "Name": "EBILL-SubscriptionConfig.xml",
+				"Type": "LocalEntry"
+			}
+		]
+	}
+}

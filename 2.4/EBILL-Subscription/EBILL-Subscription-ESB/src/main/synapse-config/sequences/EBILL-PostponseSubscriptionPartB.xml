@@ -1,0 +1,220 @@
+<sequence name="EBILL-PostponseSubscriptionPartB" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+   <log level="custom">
+      <property expression="$ctx:subscriptionId" name="*****Condition: Update Subscription Resource*****"/>
+      <property expression="$body/*" name="***** Update Subscription body*****"/>
+      <property expression="get-property('requestDate')" name="ContractEffectiveDate"/>
+      <property expression="get-property('subscriptionPostponeDate')" name="ServiceActivationDate"/>
+   </log>
+   <property action="remove" name="REST_URL_POSTFIX" scope="axis2"/>
+   <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+   <!--xslt to tranform the request-->
+   <xslt key="gov:xslts/EBILL-Subscription/2.4/PostponeSubscription_RequestforUpdate.xslt">
+     <property expression="get-property('subscriptionPostponeDate')" name="ServiceActivationDate"/>
+   </xslt>
+   <log level="custom">
+      <property expression="$body/*" name="After UpdateSusbcription-Request xslt"/>
+      <property expression="$ctx:uri.var.serviceName" name="UpdateSusbcription-URL"/>
+   </log>
+   <!--token-config file-->
+   <property expression="get-property('OAuth-TokenConfig')" name="tokenConfig" scope="default" type="OM"/>
+   <property expression="$ctx:tokenConfig/*[local-name()='OAuth']" name="OAuthToken" scope="default" type="STRING"/>
+   <property expression="concat('Bearer ',$ctx:OAuthToken)" name="Authorization" scope="transport" type="STRING"/>
+   <!--config file with endpoint-->
+   <property expression="$ctx:SubscriptionConfig/*[local-name()='updateUrl']/text()" name="serviceName" scope="default" type="STRING"/>
+   <property expression="concat($ctx:serviceName,$ctx:subscriptionId)" name="uri.var.serviceName" scope="default" type="STRING"/>
+   <property action="remove" name="Content-Encoding" scope="transport"/>
+   <property expression="get-property('requestId')" name="X-SE-IFW-RequestId" scope="transport" type="STRING"/>
+   <property name="FORCE_ERROR_ON_SOAP_FAULT" scope="default" type="STRING" value="true"/>
+   <property name="HTTP_METHOD" scope="axis2" type="STRING" value="PUT"/>
+   <property name="messageType" scope="axis2" type="STRING" value="application/xml"/>
+   <property name="ContentType" scope="axis2" type="STRING" value="application/xml"/>
+   <log level="custom">
+      <property expression="$body/*" name="UpdateSusbcription-Request"/>
+      <property expression="$ctx:uri.var.serviceName" name="UpdateSusbcription-URL"/>
+   </log>
+   <!--calling common endpoint for update subscription-->
+   <call>
+      <endpoint key="APIM_REST_Endpoint"/>
+   </call>
+   <log level="custom">
+      <property expression="$axis2:HTTP_SC" name="*****Update Status Code****"/>
+   </log>
+   <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+   <property name="logText" scope="default" type="STRING" value="updateSubscription_Response"/>
+   <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+   <!--Filter to check HTTP status code-->
+   <filter regex="true" source="boolean(contains($axis2:HTTP_SC,'200'))">
+      <then>
+         <property action="remove" name="REST_URL_POSTFIX" scope="axis2"/>
+         <script language="js">var x = Math.floor((Math.random() * 1000000) + 1);
+					           mc.setProperty('randomNumber',x.toString());</script>
+         <property expression="$ctx:randomNumber" name="randomNumber" scope="default" type="STRING"/>
+         <enrich>
+            <source clone="true" property="queryResponse" type="property"/>
+            <target type="body"/>
+         </enrich>
+         <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+         <property expression="$body/queryResponse/result/records[last()]/OriginalId/text()" name="subscriptionId" scope="default" type="STRING"/>
+         <property expression="$ctx:SubscriptionConfig/*[local-name()='callBackurl']/text()" name="callBackurl" scope="default" type="STRING"/>
+         <property expression="$ctx:SubscriptionConfig/*[local-name()='amendmentName']/text()" name="name" scope="default" type="STRING"/>
+         <property expression="$ctx:SubscriptionConfig/*[local-name()='amendmentType']/text()" name="type" scope="default" type="STRING"/>
+         <property expression="$ctx:SubscriptionConfig/*[local-name()='amendmentStatus']/text()" name="status" scope="default" type="STRING"/>
+         <log level="custom">
+            <property expression="$ctx:subscriptionPostponeDate" name="*****subscriptionPostponeDate****"/>
+         </log>
+         <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+         <!--xslt to tranform the request-->
+         <xslt key="gov:xslts/EBILL-Subscription/2.4/PostponeSubscription_RequestforAmend.xslt">
+            <property expression="$ctx:subscriptionPostponeDate" name="subscriptionPostponeDate"/>
+            <property expression="$ctx:randomNumber" name="sourceId"/>
+            <property expression="$ctx:subscriptionId" name="subscriptionId"/>
+            <property expression="$ctx:callBackurl" name="callBackurl"/>
+            <property expression="$ctx:name" name="name"/>
+            <property expression="$ctx:type" name="type"/>
+            <property expression="$ctx:status" name="status"/>
+         </xslt>
+         <!--token-config file-->
+         <property expression="get-property('OAuth-TokenConfig')" name="tokenConfig" scope="default" type="OM"/>
+         <property expression="$ctx:tokenConfig/*[local-name()='OAuth']" name="OAuthToken" scope="default" type="STRING"/>
+         <property expression="concat('Bearer ',$ctx:OAuthToken)" name="Authorization" scope="transport" type="STRING"/>
+         <!--config file with endpoint-->
+         <property expression="$ctx:SubscriptionConfig/*[local-name()='amendUrl']/text()" name="uri.var.serviceName" scope="default" type="STRING"/>
+         <property action="remove" name="Content-Encoding" scope="transport"/>
+         <property expression="get-property('requestId')" name="X-SE-IFW-RequestId" scope="transport" type="STRING"/>
+         <property name="FORCE_ERROR_ON_SOAP_FAULT" scope="default" type="STRING" value="true"/>
+         <property name="HTTP_METHOD" scope="axis2" type="STRING" value="PUT"/>
+         <property name="messageType" scope="axis2" type="STRING" value="application/xml"/>
+         <property name="ContentType" scope="axis2" type="STRING" value="application/xml"/>
+         <log level="custom">
+            <property expression="$body" name="****Condition:UpdateSubscriptionCallSuccessInvokingAmendSusbcriptionCall****"/>
+            <property expression="$ctx:uri.var.serviceName" name="*****Amendment Api URL****"/>
+         </log>
+         <!--calling common endpoint for amendment subscription-->
+         <call>
+            <endpoint key="APIM_REST_Endpoint"/>
+         </call>
+         <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+         <property name="logText" scope="default" type="STRING" value="AmendmentSubscription_Response"/>
+         <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+         <property name="amendmentSubscriptionId" expression="$body/AmendSubscriptionResponse/subscribeResponse/subscription/subscriptionId/text()" type="STRING"/>
+         <log level="custom">
+            <property expression="$axis2:HTTP_SC" name="*****Amendment Status Code****"/>
+         </log>
+         <!--Filter to check HTTP status code and success value from amendment response-->
+         <filter regex="true" source="boolean(contains($axis2:HTTP_SC,'200') and $body/AmendSubscriptionResponse/subscribeResponse/subscription/success ='true')">
+            <then>
+               <log level="custom">
+                  <property expression="$axis2:HTTP_SC" name="*****Amendment Status Code****"/>
+                  <property value="****AmendmentcallSuccess:Subscription Is Successfully Postponed*****" name="Message"/>
+               </log>
+               <!--Filter to check accept type and send response-->
+               <filter regex="application/xml" source="get-property('operation','accept')">
+                  <then>
+                     <payloadFactory media-type="xml">
+                        <format>
+                           <subscription xmlns="">
+                              <subscriptionId>$1</subscriptionId>
+                           </subscription>
+                        </format>
+                        <args>
+                           <arg evaluator="xml" expression="$ctx:amendmentSubscriptionId"/>
+                        </args>
+                     </payloadFactory>
+                     <property name="messageType" scope="axis2" type="STRING" value="application/xml"/>
+                     <property name="ContentType" scope="axis2" type="STRING" value="application/xml"/>
+                  </then>
+                  <else>
+                     <payloadFactory media-type="json">
+                        <format>{ "subscriptionId": "$1" }</format>
+                        <args>
+                           <arg evaluator="xml" expression="$ctx:amendmentSubscriptionId"/>
+                        </args>
+                     </payloadFactory>
+                     <property name="messageType" scope="axis2" type="STRING" value="application/json"/>
+                     <property name="ContentType" scope="axis2" type="STRING" value="application/json"/>
+                  </else>
+               </filter>
+               <respond/>
+            </then>
+            <else>
+               <enrich>
+                  <source clone="true" property="queryResponse" type="property"/>
+                  <target type="body"/>
+               </enrich>
+               <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+               <property expression="$body/queryResponse/result/records[last()]/OriginalId/text()" name="subscriptionId" scope="default" type="STRING"/>
+               <log level="custom">
+                  <property expression="$body/*" name="****Condition:UpdateSubscriptionSuccessAmendFailure:RevertChanges****"/>
+               </log>
+               <property action="remove" name="REST_URL_POSTFIX" scope="axis2"/>
+               <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+               <xslt key="gov:xslts/EBILL-Subscription/2.4/QueryAResponse_AmendSubcriptionResponse_Validate.xslt"/>
+               <property name="logText" scope="default" type="STRING" value="QueryAResponse_AmendSubcriptionResponse_Validate"/>
+               <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+               <!--xslt to tranform the request-->
+               <log level="custom">
+                  <property expression="$body/*" name="****Before revert xslt****"/>
+               </log>
+               <xslt key="gov:xslts/EBILL-Subscription/2.4/PostponeSubscription_RequestforUpdate.xslt">
+              <property expression="$body/OriginalSubscription/records/ServiceActivationDate/text()" name="ServiceActivationDate"/>
+               </xslt>
+               <log level="custom">
+                  <property expression="$body/*" name=" update subscription changes Back"/>
+               </log>
+               <!--token-config file-->
+               <property expression="get-property('OAuth-TokenConfig')" name="tokenConfig" scope="default" type="OM"/>
+               <property expression="$ctx:tokenConfig/*[local-name()='OAuth']" name="OAuthToken" scope="default" type="STRING"/>
+               <property expression="concat('Bearer ',$ctx:OAuthToken)" name="Authorization" scope="transport" type="STRING"/>
+               <!--config file with endpoint-->
+               <property expression="$ctx:SubscriptionConfig/*[local-name()='updateUrl']/text()" name="serviceName" scope="default" type="STRING"/>
+               <property expression="concat($ctx:serviceName,$ctx:subscriptionId)" name="uri.var.serviceName" scope="default" type="STRING"/>
+               <property action="remove" name="Content-Encoding" scope="transport"/>
+               <property expression="get-property('requestId')" name="X-SE-IFW-RequestId" scope="transport" type="STRING"/>
+               <property name="FORCE_ERROR_ON_SOAP_FAULT" scope="default" type="STRING" value="true"/>
+               <property name="HTTP_METHOD" scope="axis2" type="STRING" value="PUT"/>
+               <property name="messageType" scope="axis2" type="STRING" value="application/xml"/>
+               <property name="ContentType" scope="axis2" type="STRING" value="application/xml"/>
+               <log level="custom">
+                  <property expression="$body" name="UpdateSusbcription-Request"/>
+                  <property expression="$ctx:uri.var.serviceName" name="****UpdateSusbcriptionURL*****"/>
+               </log>
+               <!--calling common endpoint for update subscription-->
+               <call>
+                  <endpoint key="APIM_REST_Endpoint"/>
+               </call>
+               <property name="logText" scope="default" type="STRING" value="updateSubscription_Response"/>
+               <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+               <property name="updateSubscriptionId" expression="$body/jsonObject/subscriptionId/text()"/>
+               <log level="custom">
+                  <property expression="$axis2:HTTP_SC" name="*****updateSubscription Response Status****"/>
+               </log>
+               <!--Filter to check HTTP status for Update subscription response-->
+               <filter regex="true" source="boolean(contains($axis2:HTTP_SC,'200'))">
+                  <then>
+                     <log level="custom">
+                        <property value="Error Occured in Amendment call,reverted to Original subscription Dates" name="message"/>
+                     </log>
+                     <property name="code" scope="default" type="STRING" value="ERROR"/>
+                     <property expression="$ctx:SubscriptionConfig/*[local-name()='faultCode']/*[local-name()='cannotPostponecase3']/text()" name="description" scope="default" type="STRING"/>
+                     <property name="HTTP_SC" scope="axis2" type="INTEGER" expression="$axis2:HTTP_SC"/>
+                     <sequence key="EBILL-PostponeSubscriptionFault-2_4"/>
+                  </then>
+                  <else>
+                     <!--Error in update subscription call-->
+                     <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+                     <property expression="$body/jsonObject/fault/code/text()" name="code" scope="default" type="STRING"/>
+                     <property expression="$body/jsonObject/fault/description/text()" name="description" scope="default" type="STRING"/>
+                     <sequence key="EBILL-PostponeSubscriptionFault-2_4"/>
+                  </else>
+               </filter>
+            </else>
+         </filter>
+      </then>
+      <else>
+         <!--Error from update subscription API call-->
+         <property name="errorCode" scope="default" type="STRING" expression="$body/jsonObject/fault/code/text()"/>
+         <property name="errorDescription" scope="default" type="STRING" expression="$body/jsonObject/fault/description/text()"/>
+         <sequence key="EBILL-PostponeSubscriptionFault-2_4"/>
+      </else>
+   </filter>
+</sequence>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="EBILL-GetSubscriptionsIn-2_4" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+<sequence key="gov:sequences/common/1.0/IncomingRequestLogger.xml"/>
+  <sequence key="gov:sequences/common/1.0/IFWHeader.xml"/>
+  <log level="custom">
+    <property expression="$body/*" name="EBILL-GetSubscription-2_4_ValidateRequest"/>
+  </log>
+  <xslt key="gov:xslts/EBILL-Subscription/2.4/GetSubscription_Mandatory.xslt"/>
+  <log level="custom">
+    <property expression="$body/*" name="EBILL-GetSubscription-2_4_ValidatedRequest"/>
+  </log>
+  <!-- property to store the fault descripton coming from GetSubscription_Mandatory XSLT -->
+  <property expression="//faultdescription/text()" name="faultdescription"
+    scope="default" type="STRING"/>
+  <!-- Filter to check the whether we got any fault from  GetSubscription_Mandatory XSLT(If request body is invalid this xslt will form fault description)-->
+  <filter xpath="string-length(get-property('faultdescription')) != 0">
+    <then>
+      <xslt key="gov:xslts/common/1.0/businessError.xslt">
+        <property name="code" value="BAD_REQUEST"/>
+        <property
+          expression="concat('Invalid Input : ',$ctx:faultdescription)" name="description"/>
+        <property name="type" value="business"/>
+        <property name="source" value="IFW"/>
+      </xslt>
+      <property name="HTTP_SC" scope="axis2" type="INTEGER" value="400"/>
+      <sequence key="gov:sequences/common/2.0/CommonFault-2_0.xml"/>
+    </then>
+    <else>
+      <property expression="get-property('Zuora-TokenConfig')"
+        name="tokenConfig" scope="default" type="OM" xmlns:ns="http://org.apache.synapse/xsd"/>
+      <!-- property to store hostname -->
+      <property
+        expression="$ctx:tokenConfig//*[local-name()='hostName']"
+        name="hostName" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+      <!-- property to store userName -->
+      <property
+        expression="$ctx:tokenConfig//*[local-name()='userName']"
+        name="userName" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+      <!-- property to store password -->
+      <property
+        expression="$ctx:tokenConfig//*[local-name()='password']"
+        name="password" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+      <!-- property to store accessToken -->
+      <property expression="$trp:X-SE-IFW-EBILLAccessToken"
+        name="accessToken" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+      <!-- checking if bFOAccountId is passed -->
+      <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="//bFOAccountId">
+        <then>
+          <property expression="//bFOAccountId/text()"
+            name="bFOAccountId" scope="default" type="STRING"/>
+          <property
+            expression="get-property('operation','incomingRequest')"
+            name="incmngRequest" scope="default" type="OM"/>
+          <!-- xslt to form the queryString -->
+          <xslt key="gov:xslts/EBILL-Subscription/2.4/GetListAccounts_Request.xslt"/>
+          <property expression="//api:queryString" name="queryString"
+            scope="default" type="STRING" xmlns:api="http://api.zuora.com/"/>
+          <log level="custom">
+            <property expression="$body/*" name="GetSubscriptions-ZuoraListAccounts-QueryCheck"/>
+          </log>
+          <!-- Checking if access token is passed -->
+          <filter xpath="string-length(get-property('accessToken')) = 0">
+            <then>
+              <zuorasoap.init>
+                <apiUrl>{$ctx:hostName}</apiUrl>
+                <username>{$ctx:userName}</username>
+                <password>{$ctx:password}</password>
+                <blocking>no</blocking>
+              </zuorasoap.init>
+              <zuorasoap.query>
+                <queryString>{$ctx:queryString}</queryString>
+              </zuorasoap.query>
+            </then>
+            <else>
+              <property expression="get-property('accessToken')"
+                name="zuorasoap.sessionId" scope="default" type="STRING" xmlns:api="http://api.zuora.com/"/>
+              <property expression="$ctx:hostName"
+                name="uri.var.zuorasoap.apiUrl" scope="default" type="STRING"/>
+              <!-- calling zuora using queryString -->
+              <zuorasoap.query>
+                <queryString>{$ctx:queryString}</queryString>
+              </zuorasoap.query>
+            </else>
+          </filter>
+          <property name="logText" scope="default" type="STRING" value="GetSubscriptions-ZuoraListAccounts Query Response"/>
+          <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+          <filter regex="0" source="//ns1:size" xmlns:ns1="http://api.zuora.com/">
+            <then>
+              <property name="ERROR_CODE" scope="default" type="STRING" value="ACCOUNT_NOT_FOUND"/>
+              <property
+                expression="fn:concat('Billing Accounts not found for the Input ',$ctx:bFOAccountId)"
+                name="ERROR_MESSAGE" scope="default" type="STRING"/>
+              <payloadFactory media-type="xml">
+                <format>
+                  <soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+                    <faultcode xmlns="">ACCOUNT_NOT_FOUND</faultcode>
+                    <faultstring xmlns="">Billing Accounts not found for the Input $1</faultstring>
+                  </soapenv:Fault>
+                </format>
+                <args>
+                  <arg evaluator="xml" expression="$ctx:bFOAccountId"/>
+                </args>
+              </payloadFactory>
+              <sequence key="EBILL-GetSubscriptionsFault-2_4"/>
+            </then>
+            <else>
+              <xslt key="gov:xslts/EBILL-Subscription/2.4/GetListAccounts_Response.xslt"/>
+            </else>
+          </filter>
+          <enrich>
+            <source clone="true" property="incmngRequest" type="property"/>
+            <target action="child" type="body"/>
+          </enrich>
+        </then>
+        <else/>
+      </filter>
+      <xslt key="gov:xslts/EBILL-Subscription/2.4/GetSubscriptions_Request.xslt"/>
+      <property
+        expression="substring(//api:queryString/text(),1,string-length(//api:queryString/text())-4)"
+        name="queryString" scope="default" type="STRING"
+        xmlns:api="http://api.zuora.com/" xmlns:ns="http://org.apache.synapse/xsd"/>
+      <property name="logText" scope="default" type="STRING" value="GetSubscriptions-ZuoraListSubscriptions-QueryCheck"/>
+      <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+      <filter xmlns:ns="http://org.apache.synapse/xsd" xpath="string-length(get-property('accessToken')) = 0">
+        <then>
+          <zuorasoap.init>
+            <apiUrl>{$ctx:hostName}</apiUrl>
+            <username>{$ctx:userName}</username>
+            <password>{$ctx:password}</password>
+            <blocking>no</blocking>
+          </zuorasoap.init>
+          <zuorasoap.query>
+            <queryString>{$ctx:queryString}</queryString>
+          </zuorasoap.query>
+        </then>
+        <else>
+          <property expression="get-property('accessToken')"
+            name="zuorasoap.sessionId" scope="default" type="STRING" xmlns:api="http://api.zuora.com/"/>
+          <property expression="$ctx:hostName"
+            name="uri.var.zuorasoap.apiUrl" scope="default" type="STRING"/>
+          <zuorasoap.query>
+            <queryString>{$ctx:queryString}</queryString>
+          </zuorasoap.query>
+        </else>
+      </filter>
+      <property name="subscriptionStatus" scope="default" type="STRING" value="Active"/>
+      <property name="logText" scope="default" type="STRING" value="GetSubscriptions-ZuoraListSubscriptions Query Response"/>
+      <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+      <xslt key="gov:xslts/EBILL-Subscription/2.4/GetSubscriptions_Response.xslt">
+        <property expression="get-property('subscriptionStatus')"
+          name="subscriptionStatus" xmlns:ns="http://org.apache.synapse/xsd"/>
+        <property expression="get-property('SYSTEM_DATE', 'yyyy-MM-dd')"
+          name="currentDate" xmlns:ns="http://org.apache.synapse/xsd"/>
+      </xslt>
+      <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+      <property
+        expression="fn:concat($ctx:proxy.name,' Final-Response')"
+        name="logText" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+      <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+      <sequence key="gov:sequences/common/1.0/CommonResponse.xml"/>
+    </else>
+  </filter>
+</sequence>

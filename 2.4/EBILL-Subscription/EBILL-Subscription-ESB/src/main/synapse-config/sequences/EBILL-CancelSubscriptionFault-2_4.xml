@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="EBILL-CancelSubscriptionFault-2_4" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+<filter regex="101500|101503|101504|101505|101508"
+    source="get-property('ERROR_CODE')" xmlns:ns="http://org.apache.synapse/xsd">
+    <then>
+      <log level="custom">
+        <property
+          expression="fn:concat('technical exception calling common fault sequence...',' cor-id:',get-property('operation','requestId'))" name="LogText"/>
+      </log>
+      <sequence description="" key="gov:sequences/common/1.0/ConnectionError.xml"/>
+    </then>
+    <else>
+      <log level="custom">
+        <property
+          expression="fn:concat('probable business exception......',' cor-id:',get-property('operation','requestId'))" name="LogText"/>
+      </log>
+      <filter xpath="string-length(get-property('errorMessage'))!=0">
+        <then>
+          <payloadFactory media-type="xml">
+            <format>
+              <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+                <soapenv:Header/>
+                <soapenv:Body>$1</soapenv:Body>
+              </soapenv:Envelope>
+            </format>
+            <args>
+              <arg evaluator="xml" expression="//*[local-name()='subscription']"/>
+            </args>
+          </payloadFactory>
+          <enrich>
+            <source clone="true" type="inline">
+              <creditBalanceAdjustment xmlns="">false</creditBalanceAdjustment>
+            </source>
+            <target action="child" type="body"/>
+          </enrich>
+          <filter regex="application/json" source="get-property('operation','accept')">
+            <then>
+              <payloadFactory media-type="json">
+                <format>$1</format>
+                <args>
+                  <arg evaluator="json" expression="$.subscription"/>
+                </args>
+              </payloadFactory>
+            </then>
+            <else/>
+          </filter>
+          <property description="" name="logText" scope="default"
+            type="STRING" value="EBILL-CancelSubscription-1_0--FinalResponse"/>
+          <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+          <sequence description="" key="gov:sequences/common/1.0/CommonResponse.xml"/>
+        </then>
+        <else/>
+      </filter>
+      <filter xpath="string-length(get-property('Errors'))!=0">
+        <then>
+          <payloadFactory media-type="xml">
+            <format>
+              <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+                <soapenv:Header/>
+                <soapenv:Body>
+                  <subscription xmlns="">
+                    <errorMessage>
+                      <errorCode>$1</errorCode>
+                      <errorDescription>$2</errorDescription>
+                    </errorMessage>
+                    <success>$3</success>
+                    <creditBalanceAdjustment>false</creditBalanceAdjustment>
+                  </subscription>
+                </soapenv:Body>
+              </soapenv:Envelope>
+            </format>
+            <args>
+              <arg evaluator="xml" expression="//*[local-name()='Code']"/>
+              <arg evaluator="xml" expression="//*[local-name()='Message']"/>
+              <arg evaluator="xml" expression="//*[local-name()='Success']"/>
+            </args>
+          </payloadFactory>
+          <filter regex="application/json" source="get-property('operation','accept')">
+            <then>
+              <payloadFactory media-type="json">
+                <format>$1</format>
+                <args>
+                  <arg evaluator="json" expression="$.subscription"/>
+                </args>
+              </payloadFactory>
+            </then>
+            <else/>
+          </filter>
+          <property description="" name="logText" scope="default"
+            type="STRING" value="EBILL-CancelSubscription-2_4--FinalResponse"/>
+          <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+          <sequence description="" key="gov:sequences/common/1.0/CommonResponse.xml"/>
+        </then>
+        <else/>
+      </filter>
+      <filter regex="fns:MALFORMED_QUERY" source="//*[local-name()='faultcode']/text()">
+        <then>
+          <property expression="//*[local-name()='faultcode']/text()"
+            name="code" scope="default" type="STRING"/>
+          <property expression="//*[local-name()='faultstring']/text()"
+            name="description" scope="default" type="STRING"/>
+          <property name="source" scope="default" type="STRING" value="eBill"/>
+          <property name="type" scope="default" type="STRING" value="business"/>
+          <property name="HTTP_SC" scope="axis2" type="STRING" value="500"/>
+        </then>
+        <else>
+          <filter regex="fns:INVALID_VALUE" source="//*[local-name()='faultcode']/text()">
+            <then>
+              <property
+                expression="//*[local-name()='faultcode']/text()"
+                name="code" scope="default" type="STRING"/>
+              <property
+                expression="//*[local-name()='faultstring']/text()"
+                name="description" scope="default" type="STRING"/>
+              <property name="source" scope="default" type="STRING" value="eBill"/>
+              <property name="type" scope="default" type="STRING" value="business"/>
+              <property name="HTTP_SC" scope="axis2" type="STRING" value="500"/>
+            </then>
+            <else>
+              <filter regex="fns:INVALID_SESSION" source="//*[local-name()='faultcode']/text()">
+                <then>
+                  <property name="code" scope="default" type="STRING" value="INVALID_ACCESS_TOKEN"/>
+                  <property name="description" scope="default"
+                    type="STRING" value="The provided access token is invalid"/>
+                  <property name="source" scope="default" type="STRING" value="eBill"/>
+                  <property name="type" scope="default" type="STRING" value="business"/>
+                  <property name="HTTP_SC" scope="axis2" type="STRING" value="401"/>
+                </then>
+                <else>
+                  <filter regex="fns:TEMPORARY_ERROR" source="//*[local-name()='faultcode']/text()">
+                    <then>
+                      <property
+                        expression="//*[local-name()='faultcode']/text()"
+                        name="code" scope="default" type="STRING"/>
+                      <property
+                        expression="//*[local-name()='faultstring']/text()"
+                        name="description" scope="default" type="STRING"/>
+                      <property name="source" scope="default"
+                        type="STRING" value="eBill"/>
+                      <property name="type" scope="default"
+                        type="STRING" value="business"/>
+                      <property name="HTTP_SC" scope="axis2"
+                        type="STRING" value="500"/>
+                    </then>
+                    <else>
+                      <filter regex="fns:UNKNOWN_ERROR" source="//*[local-name()='faultcode']/text()">
+                        <then>
+                          <property
+                            expression="//*[local-name()='faultcode']/text()"
+                            name="code" scope="default" type="STRING"/>
+                          <property
+                            expression="//*[local-name()='faultstring']/text()"
+                            name="description" scope="default" type="STRING"/>
+                          <property name="source" scope="default"
+                            type="STRING" value="eBill"/>
+                          <property name="type" scope="default"
+                            type="STRING" value="business"/>
+                          <property name="HTTP_SC" scope="axis2"
+                            type="STRING" value="500"/>
+                        </then>
+                        <else>
+                          <property
+                            expression="//*[local-name()='faultcode']/text()"
+                            name="code" scope="default" type="STRING"/>
+                          <property
+                            expression="//*[local-name()='faultstring']/text()"
+                            name="description" scope="default" type="STRING"/>
+                          <property name="source" scope="default"
+                            type="STRING" value="IFW"/>
+                          <property name="type" scope="default"
+                            type="STRING" value="technical"/>
+                        </else>
+                      </filter>
+                    </else>
+                  </filter>
+                </else>
+              </filter>
+            </else>
+          </filter>
+        </else>
+      </filter>
+      <log level="custom">
+        <property
+          expression="fn:concat('--Inside EBILL-CancelSubscriptionsFaultSeq--',' cor-id:',get-property('operation','requestId'))" name="LogText"/>
+        <property expression="get-property('code')" name="ERROR-CODE"/>
+        <property expression="get-property('description')" name="ERROR-DETAIL"/>
+      </log>
+      <log level="custom">
+        <property
+          expression="fn:concat('ErrorDetails',' cor-id:',get-property('operation','requestId'))" name="LogText"/>
+      </log>
+      <xslt key="gov:xslts/common/1.0/businessError.xslt">
+        <property expression="get-property('code')" name="code"/>
+        <property expression="get-property('description')" name="description"/>
+        <property expression="get-property('source')" name="source"/>
+        <property expression="get-property('type')" name="type"/>
+      </xslt>
+      <sequence key="gov:/sequences/common/2.0/CommonFault-2_0.xml"/>
+    </else>
+  </filter>
+</sequence>

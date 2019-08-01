@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="EBILL-GetSubscriptionDetailsFault-2_4" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+<!-- This sequence generates fault structure in case of GetSubscriptionDetails -->
+  <!-- This sequence is called by an sequence - EBILL-GetSubscriptionDetailsIn-2_4.xml -->
+  <!-- checking for 101500,101503,101504,101505,101508 error codes -->
+  <property expression="$trp:Accept" name="accept" scope="transport"
+    type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+  <filter regex="101500|101503|101504|101505|101508"
+    source="get-property('ERROR_CODE')" xmlns:ns="http://org.apache.synapse/xsd">
+    <then>
+      <log level="custom">
+        <property
+          expression="fn:concat('technical exception calling common fault sequence...',' cor-id:',get-property('operation','correlationId'))" name="LogText"/>
+      </log>
+      <sequence key="gov:sequences/common/1.0/ConnectionError.xml"/>
+    </then>
+    <else>
+      <log level="custom">
+        <property
+          expression="fn:concat('probable business exception......',' cor-id:',get-property('operation','correlationId'))" name="LogText"/>
+      </log>
+      <filter xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xpath="//soapenv:Fault">
+        <then>
+          <property expression="//faultcode/text()" name="code"
+            scope="default" type="STRING"/>
+          <property expression="//faultstring/text()" name="description"
+            scope="default" type="STRING"/>
+          <property name="source" scope="default" type="STRING" value="eBill"/>
+          <property name="type" scope="default" type="STRING" value="business"/>
+        </then>
+        <else>
+          <filter xpath="get-property('ERROR_CODE')='BAD_REQUEST'">
+            <then>
+              <payloadFactory media-type="xml">
+                <format>
+                  <Fault xmlns="">
+                    <faultcode>$1</faultcode>
+                    <faultstring>$2</faultstring>
+                    <detail>
+                      <businessException>
+                        <code>$1</code>
+                        <description>$2</description>
+                        <sourceSystem>$3</sourceSystem>
+                      </businessException>
+                    </detail>
+                  </Fault>
+                </format>
+                <args>
+                  <arg evaluator="xml" expression="get-property('ERROR_CODE')"/>
+                  <arg evaluator="xml" expression="get-property('ERROR_MESSAGE')"/>
+                  <arg evaluator="xml" expression="get-property('SOURCE_SYSTEM')"/>
+                </args>
+              </payloadFactory>
+              <property name="SC_ACCEPTED" scope="axis2" type="STRING" value="false"/>
+              <property name="HTTP_SC" scope="axis2" type="STRING" value="400"/>
+              <!-- setting response based on accept type -->
+              <filter xpath="get-property('operation','accept') = 'application/json'">
+                <then>
+                  <property name="messageType" scope="axis2"
+                    type="STRING" value="application/json"/>
+                  <property name="ContentType" scope="axis2"
+                    type="STRING" value="application/json"/>
+                </then>
+                <else>
+                  <property name="messageType" scope="axis2"
+                    type="STRING" value="application/xml"/>
+                  <property name="ContentType" scope="axis2"
+                    type="STRING" value="application/xml"/>
+                </else>
+              </filter>
+              <respond/>
+            </then>
+            <else>
+              <property expression="get-property('ERROR_CODE')"
+                name="code" scope="default" type="STRING"/>
+              <property expression="get-property('ERROR_MESSAGE')"
+                name="description" scope="default" type="STRING"/>
+              <property name="source" scope="default" type="STRING" value="IFW"/>
+              <property name="type" scope="default" type="STRING" value="technical"/>
+              <payloadFactory media-type="xml">
+                <format>
+                  <Fault xmlns="">
+                    <faultcode>$1</faultcode>
+                    <faultstring>$2</faultstring>
+                    <detail>
+                      <technicalException>
+                        <code>$1</code>
+                        <description>$2</description>
+                      </technicalException>
+                    </detail>
+                  </Fault>
+                </format>
+                <args>
+                  <arg evaluator="xml" expression="$ctx:code"/>
+                  <arg evaluator="xml" expression="$ctx:description"/>
+                </args>
+              </payloadFactory>
+              <property name="SC_ACCEPTED" scope="axis2" type="STRING" value="false"/>
+              <property name="HTTP_SC" scope="axis2" type="STRING" value="500"/>
+              <!-- setting response based on accept type -->
+              <filter xpath="get-property('operation','accept') = 'application/json'">
+                <then>
+                  <property name="messageType" scope="axis2"
+                    type="STRING" value="application/json"/>
+                  <property name="ContentType" scope="axis2"
+                    type="STRING" value="application/json"/>
+                </then>
+                <else>
+                  <property name="messageType" scope="axis2"
+                    type="STRING" value="application/xml"/>
+                  <property name="ContentType" scope="axis2"
+                    type="STRING" value="application/xml"/>
+                </else>
+              </filter>
+            </else>
+          </filter>
+        </else>
+      </filter>
+      <log level="custom">
+        <property
+          expression="fn:concat('--Inside GetSubscriptionDetailsFaultSeq--',' cor-id:',get-property('operation','correlationId'))" name="LogText"/>
+        <property expression="get-property('code')" name="ERROR-CODE"/>
+        <property expression="get-property('description')" name="ERROR-DETAIL"/>
+      </log>
+      <xslt key="gov:xslts/common/1.0/businessError.xslt">
+        <property expression="get-property('code')" name="code"/>
+        <property expression="get-property('description')" name="description"/>
+        <property expression="get-property('source')" name="source"/>
+        <property expression="get-property('type')" name="type"/>
+      </xslt>
+      <sequence key="gov:sequences/common/1.0/CommonFault.xml"/>
+    </else>
+  </filter>
+</sequence>

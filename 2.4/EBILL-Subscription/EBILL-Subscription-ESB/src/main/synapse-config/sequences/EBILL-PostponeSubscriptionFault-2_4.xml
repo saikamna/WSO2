@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence xmlns="http://ws.apache.org/ns/synapse" name="EBILL-PostponeSubscriptionFault-2_4" trace="disable">
+   <!-- Technical error -->
+   <filter xmlns:ns="http://org.apache.synapse/xsd" regex="101500|101503|101504|101505|101508" source="get-property('ERROR_CODE')">
+      <then>
+         <log level="custom">
+            <property expression="fn:concat('-- Inside connection error --',' cor-id:',get-property('operation','requestId'))" name="LogText" />
+            <property expression="get-property('ERROR_CODE')" name="ERROR_CODE" />
+            <property expression="get-property('ERROR_DETAIL')" name="ERROR_DETAIL" />
+         </log>
+         <property name="code" scope="default" type="STRING" value="CONNECTION_ERROR" />
+         <property name="description" scope="default" type="STRING" value="Connection to backend failed" />
+         <property name="HTTP_SC" scope="axis2" type="INTEGER" value="500" />
+      </then>
+      <else>
+         <log level="custom">
+            <property expression="fn:concat('probable business exception......',' cor-id:',get-property('operation','requestId'))" name="LogText" />
+         </log>
+         <!--Filter to check for BAD_REQUEST fault code-->
+         <filter regex="BAD_REQUEST" source="get-property('code')">
+            <then>
+               <property expression="get-property('code')" name="code" scope="default" type="STRING" />
+               <property expression="$ctx:description" name="description" scope="default" type="STRING" />
+               <property name="HTTP_SC" scope="axis2" type="INTEGER" value="400" />
+            </then>
+            <else />
+         </filter>
+         <!--Filter to check for NOT_POSTPONE fault code-->
+         <filter regex="NOT_POSTPONE" source="get-property('code')">
+            <then>
+               <property expression="get-property('code')" name="code" scope="default" type="STRING" />
+               <property expression="$ctx:description" name="description" scope="default" type="STRING" />
+               <property name="HTTP_SC" scope="axis2" type="INTEGER" value="409" />
+            </then>
+            <else />
+         </filter>
+         <!--Filter to check for NOT_POSTPONE fault code-->
+         <filter regex="500000" source="get-property('ERROR_CODE')">
+            <then>
+               <log level="custom">
+               <property value="Condition:InvalidAccessTokenPassed:Yes" name="****" />
+              </log>
+               <property value="INVALID_ACCESS_TOKEN" name="code" scope="default" type="STRING" />
+               <property value="The provided access token is invalid" name="description" scope="default" type="STRING" />
+               <property name="HTTP_SC" scope="axis2" type="INTEGER" value="401" />
+            </then>
+            <else>
+            </else>
+         </filter>
+         <!--Filter to check for NOT_FOUND fault code-->
+         <filter regex="NOT_FOUND" source="get-property('code')">
+            <then>
+               <property expression="get-property('code')" name="code" scope="default" type="STRING" />
+               <property expression="$ctx:description" name="description" scope="default" type="STRING" />
+               <property name="HTTP_SC" scope="axis2" type="INTEGER" value="404" />
+            </then>
+            <else />
+         </filter>
+         <!-- When amend fails -->
+         <filter regex="ERROR" source="get-property('code')">
+            <then>
+               <property value="NOT_POSTPONE" name="code" scope="default" type="STRING" />
+               <property expression="$ctx:description" name="description" scope="default" type="STRING" />
+               <property name="HTTP_SC" scope="axis2" expression="$ctx:HTTP_SC" />
+            </then>
+            <else />
+         </filter>
+         <!--Filter to check for errorCode from sequence-->
+         <filter regex="true" source="get-property('errorCode')!=0.0">
+            <then>
+               <property expression="get-property('errorCode')" name="code" scope="default" type="STRING" />
+               <property expression="$ctx:errorDescription" name="description" scope="default" type="STRING" />
+            </then>
+            <else />
+         </filter>
+      </else>
+   </filter>
+   <!--Common fault 4.0-->
+   <sequence description="" key="gov:sequences/common/4.0/CommonFault-4_0.xml" />
+</sequence>

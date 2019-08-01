@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<localEntry key="EBILL-SubscriptionConfig" xmlns="http://ws.apache.org/ns/synapse">
+  <Subscription>
+    <updateUrl>rest/ebill/subscription/2.4/subscription/</updateUrl>
+    <amendUrl>rest/ebill/subscription/2.4/subscriptions</amendUrl>
+    <callBackurl>http://www.test.com/ifw_service</callBackurl>
+    <amendmentName>Test</amendmentName>
+    <amendmentType>TermsAndConditions</amendmentType>
+    <amendmentStatus>Completed</amendmentStatus>
+    <faultCode>
+      <existAmend>There are existing amendment and cannot postpone the subscription</existAmend>
+      <cannotPostponecase1>Subscription already started and cannot postpone the subscription</cannotPostponecase1>
+      <cannotPostponecase2>Subscription can only be postpone</cannotPostponecase2>
+      <cannotPostponecase3>Error occured in Amendment call, reverted to Original Subscription Dates</cannotPostponecase3>
+    </faultCode>
+  </Subscription>
+</localEntry>

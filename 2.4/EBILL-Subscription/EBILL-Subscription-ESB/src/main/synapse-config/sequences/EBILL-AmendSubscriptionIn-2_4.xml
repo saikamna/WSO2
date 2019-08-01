@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="EBILL-AmendSubscriptionIn-2_4" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+<sequence key="gov:sequences/common/1.0/IncomingRequestLogger.xml"/>
+  <sequence key="gov:sequences/common/1.0/IFWHeader.xml"/>
+  <log level="custom">
+    <property expression="$body/*" name="EBILL-AmendSubscriptions-2_4_ValidateRequest"/>
+  </log>
+  <xslt key="gov:xslts/EBILL-Subscription/2.4/AmendSubscription_Mandatory.xslt"/>
+  <log level="custom">
+    <property expression="$body/*" name="EBILL-AmendSubscriptions-2_4_ValidatedRequest"/>
+  </log>
+  <!-- property to store the fault descripton coming from AmendSubscription_Mandatory XSLT -->
+  <property expression="//faultdescription/text()" name="faultdescription"
+    scope="default" type="STRING"/>
+  <!-- Filter to check the whether we got any fault from  AmendSubscription_Mandatory XSLT(If request body is invalid this xslt will form fault description)-->
+  <filter xpath="string-length(get-property('faultdescription')) != 0">
+    <then>
+      <xslt key="gov:xslts/common/1.0/businessError.xslt">
+        <property name="code" value="BAD_REQUEST"/>
+        <property
+          expression="concat('Invalid Input : ',$ctx:faultdescription)" name="description"/>
+        <property name="type" value="business"/>
+        <property name="source" value="IFW"/>
+      </xslt>
+      <property name="HTTP_SC" scope="axis2" type="INTEGER" value="400"/>
+      <sequence key="gov:sequences/common/2.0/CommonFault-2_0.xml"/>
+    </then>
+    <else>
+      <property expression="get-property('Zuora-TokenConfig')"
+        name="tokenConfig" scope="default" type="OM"/>
+      <property
+        expression="$ctx:tokenConfig//*[local-name()='hostName']"
+        name="hostName" scope="default" type="STRING"/>
+      <property
+        expression="$ctx:tokenConfig//*[local-name()='userName']"
+        name="userName" scope="default" type="STRING"/>
+      <property
+        expression="$ctx:tokenConfig//*[local-name()='password']"
+        name="password" scope="default" type="STRING"/>
+      <!-- property to store accessToken -->
+      <property expression="$trp:X-SE-IFW-EBILLAccessToken"
+        name="accessToken" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+      <!-- xslt to transform request -->
+      <xslt key="gov:xslts/EBILL-Subscription/2.4/AmendSubscription_Request.xslt"/>
+      <property expression="//api:requests" name="queryString"
+        scope="default" type="STRING" xmlns:api="http://api.zuora.com/"/>
+      <log level="custom">
+        <property expression="$body/*" name="AmendSubscription-QueryCheck"/>
+      </log>
+      <!-- checking if access token is passed -->
+      <filter description="" xpath="string-length(get-property('accessToken')) = 0">
+        <then>
+          <zuorasoap.init>
+            <apiUrl>{$ctx:hostName}</apiUrl>
+            <username>{$ctx:userName}</username>
+            <password>{$ctx:password}</password>
+            <blocking>no</blocking>
+          </zuorasoap.init>
+          <!-- calling zuora with query -->
+          <zuorasoap.amend>
+            <zobjects>{$ctx:queryString}</zobjects>
+          </zuorasoap.amend>
+        </then>
+        <else>
+          <property expression="get-property('accessToken')"
+            name="zuorasoap.sessionId" scope="default" type="STRING" xmlns:api="http://api.zuora.com/"/>
+          <property expression="$ctx:hostName"
+            name="uri.var.zuorasoap.apiUrl" scope="default" type="STRING"/>
+          <zuorasoap.amend>
+            <zobjects>{$ctx:queryString}</zobjects>
+          </zuorasoap.amend>
+        </else>
+      </filter>
+      <log level="custom">
+        <property expression="$body/*" name="AmendSubscription-QueryResponse"/>
+      </log>
+      <!-- xslt to transform the response -->
+      <xslt key="gov:xslts/EBILL-Subscription/2.4/AmendSubscription_Response.xslt"/>
+      <property
+        expression="fn:concat($ctx:proxy.name,' Final-Response')"
+        name="logText" scope="default" type="STRING"/>
+      <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+      <sequence description="" key="gov:sequences/common/1.0/CommonResponse.xml"/>
+    </else>
+  </filter>
+</sequence>

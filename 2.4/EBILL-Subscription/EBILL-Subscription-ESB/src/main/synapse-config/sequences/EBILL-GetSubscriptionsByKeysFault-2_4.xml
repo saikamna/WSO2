@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="EBILL-GetSubscriptionsByKeysFault-2_4" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+<!-- This sequence generates fault structure in case of GetSubscriptionByKeys -->
+  <!-- This sequence is called by an sequence - EBILL-GetSubscriptionsByKeysIn-2_4.xml -->
+  <!-- checking for 101500,101503,101504,101505,101508 error codes -->
+  <filter regex="101500|101503|101504|101505|101508"
+    source="get-property('ERROR_CODE')" xmlns:ns="http://org.apache.synapse/xsd">
+    <then>
+      <log level="custom">
+        <property
+          expression="fn:concat('technical exception calling common fault sequence...',' cor-id:',get-property('operation','requestId'))" name="LogText"/>
+      </log>
+      <sequence description="" key="gov:sequences/common/1.0/ConnectionError.xml"/>
+    </then>
+    <else>
+      <log level="custom">
+        <property
+          expression="fn:concat('probable business exception......',' cor-id:',get-property('operation','requestId'))" name="LogText"/>
+      </log>
+      <filter xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xpath="//soapenv:Fault">
+        <then>
+          <filter regex="fns:MALFORMED_QUERY" source="//faultcode/text()">
+            <then>
+              <property name="code" scope="default" type="STRING" value="MALFORMED_QUERY"/>
+              <property expression="//faultstring/text()"
+                name="description" scope="default" type="STRING"/>
+              <property name="source" scope="default" type="STRING" value="eBill"/>
+              <property name="type" scope="default" type="STRING" value="technical"/>
+              <property name="HTTP_SC" scope="axis2" type="STRING" value="500"/>
+            </then>
+            <else>
+              <filter regex="fns:INVALID_VALUE" source="//faultcode/text()">
+                <then>
+                  <property name="code" scope="default" type="STRING" value="INVALID_VALUE"/>
+                  <property expression="//faultstring/text()"
+                    name="description" scope="default" type="STRING"/>
+                  <property name="source" scope="default" type="STRING" value="eBill"/>
+                  <property name="type" scope="default" type="STRING" value="business"/>
+                  <property name="HTTP_SC" scope="axis2" type="STRING" value="200"/>
+                </then>
+                <else>
+                  <filter regex="fns:INVALID_SESSION" source="//faultcode/text()">
+                    <then>
+                      <property name="code" scope="default"
+                        type="STRING" value="INVALID_ACCESS_TOKEN"/>
+                      <property name="description" scope="default"
+                        type="STRING" value="The provided access token is invalid"/>
+                      <property name="source" scope="default"
+                        type="STRING" value="eBill"/>
+                      <property name="type" scope="default"
+                        type="STRING" value="business"/>
+                      <property name="HTTP_SC" scope="axis2"
+                        type="STRING" value="401"/>
+                    </then>
+                    <else>
+                      <filter regex="fns:TEMPORARY_ERROR" source="//faultcode/text()">
+                        <then>
+                          <property expression="//faultcode/text()"
+                            name="code" scope="default" type="STRING"/>
+                          <property expression="//faultstring/text()"
+                            name="description" scope="default" type="STRING"/>
+                          <property name="source" scope="default"
+                            type="STRING" value="eBill"/>
+                          <property name="type" scope="default"
+                            type="STRING" value="business"/>
+                          <property name="HTTP_SC" scope="axis2"
+                            type="STRING" value="500"/>
+                        </then>
+                        <else>
+                          <filter regex="fns:UNKNOWN_ERROR" source="//faultcode/text()">
+                            <then>
+                              <property expression="//faultcode/text()"
+                                name="code" scope="default" type="STRING"/>
+                              <property
+                                expression="//faultstring/text()"
+                                name="description" scope="default" type="STRING"/>
+                              <property name="source" scope="default"
+                                type="STRING" value="eBill"/>
+                              <property name="type" scope="default"
+                                type="STRING" value="business"/>
+                              <property name="HTTP_SC" scope="axis2"
+                                type="STRING" value="500"/>
+                            </then>
+                            <else>
+                              <property expression="//faultcode/text()"
+                                name="code" scope="default" type="STRING"/>
+                              <property
+                                expression="//faultstring/text()"
+                                name="description" scope="default" type="STRING"/>
+                              <property name="source" scope="default"
+                                type="STRING" value="IFW"/>
+                              <property name="type" scope="default"
+                                type="STRING" value="technical"/>
+                            </else>
+                          </filter>
+                        </else>
+                      </filter>
+                    </else>
+                  </filter>
+                </else>
+              </filter>
+            </else>
+          </filter>
+        </then>
+        <else/>
+      </filter>
+      <log level="custom">
+        <property
+          expression="fn:concat('--Inside EBILL-GetSubscriptionsByKeysFaultSeq--',' cor-id:',get-property('operation','requestId'))" name="LogText"/>
+        <property expression="get-property('code')" name="ERROR-CODE"/>
+        <property expression="get-property('description')" name="ERROR-DETAIL"/>
+      </log>
+      <log level="custom">
+        <property
+          expression="fn:concat('ErrorDetails',' cor-id:',get-property('operation','requestId'))" name="LogText"/>
+      </log>
+      <xslt key="gov:xslts/common/1.0/businessError.xslt">
+        <property expression="get-property('code')" name="code"/>
+        <property expression="get-property('description')" name="description"/>
+        <property expression="get-property('source')" name="source"/>
+        <property expression="get-property('type')" name="type"/>
+      </xslt>
+      <sequence key="gov:/sequences/common/2.0/CommonFault-2_0.xml"/>
+    </else>
+  </filter>
+</sequence>

@@ -1,0 +1,80 @@
+<sequence name="EBILL-UpdateSubscriptionFault-2_4" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+<!-- property to read the staus code -->
+<property expression="$axis2:HTTP_SC" name="httpStatusCode"
+                scope="default" type="STRING"/>
+   <filter regex="101500|101503|101504|101505|101508" source="get-property('ERROR_CODE')" xmlns:ns="http://org.apache.synapse/xsd">
+      <then>
+         <log level="custom">
+            <property expression="fn:concat('technical exception calling common fault sequence...',' cor-id:',get-property('operation','correlationId'))" name="LogText"/>
+         </log>
+         <sequence description="" key="gov:sequences/common/1.0/ConnectionError.xml"/>
+      </then>
+      <else>
+         <log level="custom">
+            <property expression="fn:concat('probable business exception......',' cor-id:',get-property('operation','correlationId'))" name="LogText"/>
+         </log>
+         <!-- filter to check if the status code is 401 -->
+         <filter xpath="$ctx:httpStatusCode ='401'">
+                <then>
+                    <property name="code" scope="default" type="STRING" value="INVALID_ACCESS_TOKEN"/>
+                    <property name="description" scope="default"
+                        type="STRING" value="The provided access token is invalid"/>
+                    <sequence key="gov:sequences/common/4.0/CommonFault-4_0.xml"/>
+                </then>
+                <else/>
+            </filter>
+            <!-- filter to check if the backend is throwing soapenv:Fault -->
+         <filter xpath="//soapenv:Fault" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+            <then>
+               <property expression="//faultcode/text()" name="code" scope="default" type="STRING"/>
+               <property expression="//faultstring/text()" name="description" scope="default" type="STRING"/>
+               <filter regex="fns:INVALID_SESSION" source="get-property('code')">
+                  <then>
+                     <property name="code" scope="default" type="STRING" value="INVALID_ACCESS_TOKEN"/>
+                     <property name="description" scope="default" type="STRING" value="The provided access token is invalid"/>
+                  </then>
+                  <else>
+                  <!-- filter to check for code -->
+                     <filter xpath="soapenv:Server" source="get-property('code')">
+                        <then>
+                            <property name="code" scope="default" type="STRING" expression="$body/*[local-name()='Fault']/*[local-name()='faultcode']"/>
+							<property expression="$body/*[local-name()='Fault']/*[local-name()='faultstring']/text()" name="description" scope="default" type="STRING"/>
+                           <xslt key="gov:xslts/common/1.0/businessError.xslt">
+                              <property expression="get-property('code')" name="code"/>
+                              <property expression="get-property('description')" name="description"/>
+                           </xslt>
+                           <sequence key="gov:sequences/common/4.0/CommonFault-4_0.xml"/>
+                        </then>
+                        <else>
+                        <!-- filter to check for invalid id -->
+                           <filter regex="INVALID_ID" source="get-property('code')">
+                              <then>
+                                <property name="code" scope="default" type="STRING" value="NOT_FOUND "/>
+                                <property name="description" scope="default" type="STRING" value="The provided input is not found"/>
+								<property name="HTTP_SC" scope="axis2" type="INTEGER" value="404"/>
+                              </then>
+                              <else>
+							   <property expression="$body/*[local-name()='Fault']/*[local-name()='faultcode']" name="code" scope="default" type="STRING"/>
+                                 <property expression="$body/*[local-name()='Fault']/*[local-name()='faultstring']/text()" name="description" scope="default" type="STRING"/>
+                              </else>
+                           </filter>
+                        </else>
+                     </filter>
+                  </else>
+               </filter>
+            </then>
+            <else>
+               <property name="code" scope="default" type="STRING" value="CONNECTION_ERROR"/>
+               <property name="description" scope="default" type="STRING" value="Connection to backend failed"/>
+               <property name="source" scope="default" type="STRING" value="IFW"/>
+               <property name="type" scope="default" type="STRING" value="technical"/>
+            </else>
+         </filter>
+         <xslt key="gov:xslts/common/1.0/businessError.xslt">
+            <property expression="get-property('code')" name="code"/>
+            <property expression="get-property('description')" name="description"/>
+         </xslt>
+         <sequence description="" key="gov:sequences/common/4.0/CommonFault-4_0.xml"/>
+      </else>
+   </filter>
+</sequence>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<localEntry key="EBILL-CancelSubscription-2_4_Config" xmlns="http://ws.apache.org/ns/synapse">
+  <cancelSubscription>
+    <value>rest/ebill/subscription/2.4/subscriptions</value>
+  </cancelSubscription>
+</localEntry>

@@ -1,0 +1,314 @@
+<sequence name="EBILL-PostponeSubscriptionIn-2_4" onError="EBILL-PostponeSubscriptionFault-2_4" xmlns="http://ws.apache.org/ns/synapse">
+   <sequence key="gov:sequences/common/1.0/IncomingRequestLogger.xml"/>
+   <sequence key="gov:sequences/common/1.0/IFWHeader.xml"/>
+   <log level="custom">
+      <property expression="$body/*" name="EBILL-PostponeSubscriptionIn-Incoming-Request" xmlns:ns="http://org.apache.synapse/xsd"/>
+   </log>
+   <!--property to store applicationName-->
+   <property name="applicationName" scope="operation" type="STRING" value="value"/>
+   <!--Defining Path parameter in the property-->
+   <property expression="get-property('uri.var.subscriptionName')" name="subscriptionName" scope="default" type="STRING"/>
+   <!--property to store X-SE-IFW-EBILLAccessToken-->
+   <property expression="$trp:X-SE-IFW-EBILLAccessToken" name="OAuthToken" scope="operation" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+   <!--Reading subscription postpone date-->
+   <property name="subscriptionPostponeDate" expression="$body/*[1]/subscriptionPostponeDate/text()" type="STRING"/>
+   <!--Reading subscription request date-->
+   <property name="requestDate" expression="$body/*[1]/requestDate/text()" type="STRING"/>
+   <!--Filter to validate the mandatory fields-->
+   <filter xpath="string-length($body/*[1]/subscriptionPostponeDate/text()) =0.0 and string-length($body/*[1]/requestDate/text()) =0.0" xmlns:ns="http://org.apache.synapse/xsd">
+      <then>
+         <property name="code" scope="default" type="STRING" value="BAD_REQUEST"/>
+         <property name="description" scope="default" type="STRING" value="Invalid Input: Mandatory field cannot be empty -[subscriptionPostponeDate],[requestDate]"/>
+         <sequence key="EBILL-PostponeSubscriptionFault-2_4"/>
+      </then>
+      <else>
+         <!--Filter to validate requestDate field-->
+         <filter xpath="string-length($body/*[1]/subscriptionPostponeDate/text()) !=0.0 and string-length($body/*[1]/requestDate/text()) = 0.0">
+            <then>
+               <property name="code" scope="default" type="STRING" value="BAD_REQUEST"/>
+               <property name="description" scope="default" type="STRING" value="Invalid Input: Mandatory field cannot be empty - [requestDate]"/>
+               <sequence key="EBILL-PostponeSubscriptionFault-2_4"/>
+            </then>
+            <else>
+               <!--Filter to validate subscriptionPostponeDate field-->
+               <filter xpath="string-length($body/*[1]/subscriptionPostponeDate/text()) =0.0 and string-length($body/*[1]/requestDate/text()) !=0.0">
+                  <then>
+                     <property name="code" scope="default" type="STRING" value="BAD_REQUEST"/>
+                     <property name="description" scope="default" type="STRING" value="Invalid Input: Mandatory field cannot be empty - [subscriptionPostponeDate]"/>
+                     <sequence key="EBILL-PostponeSubscriptionFault-2_4"/>
+                  </then>
+               </filter>
+            </else>
+         </filter>
+      </else>
+   </filter>
+   <!--Reading EBILL-SubscriptionConfig file-->
+   <property expression="get-property('EBILL-SubscriptionConfig')" name="SubscriptionConfig" scope="default" type="OM"/>
+   <property name="quote" value="'"/>
+   <property expression="concat('Select ContractEffectiveDate,OriginalId,TermStartDate,ServiceActivationDate,TermType,CurrentTerm,CurrentTermPeriodType,RenewalSetting,RenewalTerm,RenewalTermPeriodType,Autorenew,Version from Subscription where Name =',$ctx:quote,$ctx:subscriptionName,$ctx:quote)" name="queryString" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+   <log level="custom">
+      <property expression="$ctx:queryString" name="****queryString****" xmlns:ns="http://org.apache.synapse/xsd"/>
+   </log>
+   <property expression="get-property('Zuora-TokenConfig')" name="tokenConfig" scope="default" type="OM" xmlns:ns="http://org.apache.synapse/xsd"/>
+   <property expression="$ctx:tokenConfig//*[local-name()='hostName']" name="hostName" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+   <property expression="$ctx:tokenConfig//*[local-name()='userName']" name="userName" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+   <property expression="$ctx:tokenConfig//*[local-name()='password']" name="password" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+   <!--Filter to check  X-SE-IFW-EBILLAccessToken header-->
+   <filter xpath="string-length(get-property('operation','OAuthToken')) = 0.0" xmlns:ns="http://org.apache.synapse/xsd">
+      <then>
+         <!--Generation of authorization token-->
+         <zuorasoap.init>
+            <apiUrl>{$ctx:hostName}</apiUrl>
+            <username>{$ctx:userName}</username>
+            <password>{$ctx:password}</password>
+            <blocking>no</blocking>
+         </zuorasoap.init>
+         <log level="custom">
+            <property expression="$body/*[local-name()='loginResponse']/*[local-name()='result']/*[local-name()='Session']/text()" name="****sessionId****" scope="default" type="STRING"/>
+         </log>
+         <property expression="$body/*[local-name()='loginResponse']/*[local-name()='result']/*[local-name()='Session']/text()" name="sessionId" scope="default" type="STRING"/>
+      </then>
+      <else>
+         <property expression="get-property('operation','OAuthToken')" name="zuorasoap.sessionId" scope="default" type="STRING" xmlns:api="http://api.zuora.com/"/>
+         <property expression="$ctx:hostName" name="uri.var.zuorasoap.apiUrl" scope="default" type="STRING"/>
+      </else>
+   </filter>
+   <!--Zuora Query call-->
+   <zuorasoap.query>
+      <queryString>{$ctx:queryString}</queryString>
+   </zuorasoap.query>
+   <property name="queryResponse" expression="$body/*" type="OM"/>
+   <property name="logText" scope="default" type="STRING" value="Zuora Subscription Query Response"/>
+   <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+   <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+   <property expression="$body/queryResponse/result/records[1]/OriginalId/text()" name="subscriptionId" scope="default" type="STRING"/>
+   <!--Filter to check the record from query response-->
+   <filter xpath="string-length($body/queryResponse/result/records) != 0.0" xmlns:ns="http://org.apache.synapse/xsd">
+      <then>
+         <property name="logText" scope="default" type="STRING" value="****Condition:RecordsFound:Yes****"/>
+         <!--Script for getting max version for subscription-->
+         <script language="js">var log = mc.getServiceLog();
+    var records = mc.getPayloadXML()..*::result..*::records;
+    log.info("records: " + records);
+
+var maxVersion = -1;
+var maxVersionId = "";
+for(var i = 0 ; i &lt; records.length() ; i++) {
+log.info("records[i].Version: " + records[i]..*::Version)
+log.info("records[i].Id: " + records[i]..*::Id)
+log.info("records[i].ServiceActivationDate: " + records[i]..*::ServiceActivationDate)
+
+if(records[i]..*::Version > maxVersion) {
+	maxVersion = records[i]..*::Version;
+	maxVersionId  = records[i]..*::Id;
+	maxVersionServiceActivationDate  = records[i]..*::ServiceActivationDate;
+	log.info("maxVersion: " + maxVersion + ", maxVersionId: " + maxVersionId + ", maxVersionServiceActivationDate: " + maxVersionServiceActivationDate);
+}
+
+}
+mc.setProperty("maxVersion",maxVersion);
+mc.setProperty("maxVersionServiceActivationDate",maxVersionServiceActivationDate);
+mc.setProperty("maxVersionId",maxVersionId);</script>
+         <!--Filter to check maximum version-->
+         <filter xpath="$ctx:maxVersion > 2">
+            <then>
+               <property name="logText" scope="default" type="STRING" value="****Condition:RecordsWithVersion grater than 2Present:Yes****"/>
+               <property name="code" scope="default" type="STRING" value="NOT_POSTPONE"/>
+               <property expression="$ctx:SubscriptionConfig/*[local-name()='faultCode']/*[local-name()='existAmend']/text()" name="description" scope="default" type="STRING"/>
+               <sequence key="EBILL-PostponeSubscriptionFault-2_4"/>
+            </then>
+            <else>
+               <property name="logText" scope="default" type="STRING" value="****Condition:RecordsWithVersion grater than 2Present:No****"/>
+               <property expression="$ctx:maxVersionServiceActivationDate" name="ServiceActivationDate"/>
+               <property expression="get-property('SYSTEM_DATE', 'yyyy-MM-dd')" name="currentDate" scope="default"/>
+               <property expression="translate($ctx:currentDate, '-', '')" name="transCurrentDate"/>
+               <property expression="translate($ctx:ServiceActivationDate, '-', '')" name="transServiceActivationDate"/>
+               <property expression="translate($ctx:subscriptionPostponeDate, '-', '')" name="transSubscriptionPostponeDate"/>
+               <log level="custom">
+                  <property expression="$ctx:transCurrentDate" name="****CurrentDate*****"/>
+                  <property expression="$ctx:transServiceActivationDate" name="****ServiceActivationDate****"/>
+               </log>
+               <!--Filter to check serviceActivationDate <= currentDate-->
+               <filter xpath="$ctx:transServiceActivationDate &lt;= $ctx:transCurrentDate">
+                  <then>
+                     <property name="logText" scope="default" type="STRING" value="****Condition:ServiceActivationDate less than CurrentTime:Yes****"/>
+                     <property name="code" scope="default" type="STRING" value="NOT_POSTPONE"/>
+                     <property expression="$ctx:SubscriptionConfig/*[local-name()='faultCode']/*[local-name()='cannotPostponecase1']/text()" name="description" scope="default" type="STRING"/>
+                     <sequence key="EBILL-PostponeSubscriptionFault-2_4"/>
+                  </then>
+                  <else>
+                     <property name="logText" scope="default" type="STRING" value="****Condition:ServiceActivationDate lessthan CurrentTime:No****"/>
+                     <!--Filter to check serviceActivationDate > subscription postpone date-->
+                     <filter xpath="$ctx:transServiceActivationDate > $ctx:transSubscriptionPostponeDate">
+                        <then>
+                           <property name="logText" scope="default" type="STRING" value="****Condition:ServiceActivationDate grater than SubscriptionPostponeDate:Yes****"/>
+                           <property name="code" scope="default" type="STRING" value="NOT_POSTPONE"/>
+                           <property expression="$ctx:SubscriptionConfig/*[local-name()='faultCode']/*[local-name()='cannotPostponecase2']/text()" name="description" scope="default" type="STRING"/>
+                           <sequence key="EBILL-PostponeSubscriptionFault-2_4"/>
+                        </then>
+                        <else>
+                           <!--Filter to check max version equal to 1-->
+                           <filter xpath="$ctx:maxVersion = 1">
+                              <then>
+                                 <property name="logText" scope="default" type="STRING" value="****Condition:Highest Version equal to 1:Yes****"/>
+                                 <sequence key="EBILL-PostponseSubscriptionPartB"/>
+                              </then>
+                              <else>
+                                 <property name="logText" scope="default" type="STRING" value="****Condition:Highest Version equal to 1:No****"/>
+                                 <log level="custom">
+                                    <property expression="$ctx:maxVersionId" name="uri.var.zuora.amendmentKey" scope="default" type="STRING"/>
+                                 </log>
+                                 <!--Getting base version details-->
+                                 <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+                                 <xslt key="gov:xslts/EBILL-Subscription/2.4/QueryAResponse_AmendSubcriptionResponse_Validate.xslt"/>
+                                 <property name="logText" scope="default" type="STRING" value="QueryAResponse_AmendSubcriptionResponse_Validate"/>
+                                 <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+                                 <!--Enriching Zuora query response-->
+                                 <enrich>
+                                    <source clone="true" type="body" xpath="$body/*"/>
+                                    <target action="replace" type="property" property="OriginalSubscription"/>
+                                 </enrich>
+                                 <property expression="$ctx:maxVersionId" name="uri.var.zuora.amendmentKey" scope="default" type="STRING"/>
+                                 <property expression="get-property('ZuoraRest-TokenConfig')" name="tokenConfigRest" scope="default" type="OM"/>
+                                 <property expression="$ctx:tokenConfigRest/*[local-name()='apiVersion']" name="uri.var.zuora.apiVersion" scope="default" type="STRING"/>
+                                 <property expression="$ctx:tokenConfigRest/*[local-name()='apiUrl']" name="uri.var.zuora.apiUrl" scope="default" type="STRING"/>
+                                 <property expression="$ctx:sessionId" name="zuorasoap.sessionId" scope="default" type="STRING"/>
+                                 <property name="HTTP_METHOD" scope="axis2" type="STRING" value="GET"/>
+                                 <header name="NO_KEEPALIVE" scope="transport" value="true"/>
+                                 <property expression="fn:concat('ZSession ', get-property('zuorasoap.sessionId'))" name="Authorization" scope="transport" type="STRING"/>
+                                 <property action="remove" name="Content-Type" scope="transport"/>
+                                 <property action="remove" name="Content-Encoding" scope="transport"/>
+                                 <property name="Content-Type" scope="transport" type="STRING" value="application/json"/>
+                                 <property name="messageType" scope="axis2" type="STRING" value="application/json"/>
+                                 <property name="ContentType" scope="axis2" type="STRING" value="application/json"/>
+                                 <property name="logText" scope="default" type="STRING" value="****Condition:FormGetAmendmentBySubscriptionCall****"/>
+                                 <log level="custom">
+                                    <property expression="concat(get-property('uri.var.zuora.apiUrl'),'/',get-property('uri.var.zuora.apiVersion'),'/amendments/subscriptions/',get-property('uri.var.zuora.amendmentKey'))" name="****Amend-Subscription-URL-Request-Zuora****"/>
+                                    <property expression="$ctx:tokenConfigRest/*[local-name()='OAuthToken']" name="zuorasoap.sessionId" scope="default" type="STRING"/>
+                                 </log>
+                                 <!--Calling GetAmendmentBySubscription service-->
+                                 <call>
+                                    <endpoint>
+                                       <http method="get" trace="disable" uri-template="{+uri.var.zuora.apiUrl}/{+uri.var.zuora.apiVersion}/amendments/subscriptions/{+uri.var.zuora.amendmentKey}"/>
+                                    </endpoint>
+                                 </call>
+                                 <log level="custom">
+                                    <property expression="json-eval($.)" name="*** GetAmendmentBySubscription-Response ***"/>
+                                 </log>
+                                 <property expression="$body/jsonObject/type" name="type" scope="default" type="STRING"/>
+                                 <property expression="$body/jsonObject/termType" name="termType" scope="default" type="STRING"/>
+                                 <property expression="$body/jsonObject/currentTerm" name="currentTerm" scope="default" type="STRING"/>
+                                 <property expression="$body/jsonObject/currentTermPeriodType" name="currentTermPeriodType" scope="default" type="STRING"/>
+                                 <property expression="$body/jsonObject/renewalSetting" name="renewalSetting" scope="default" type="STRING"/>
+                                 <property expression="$body/jsonObject/renewalSetting" name="renewalSetting" scope="default" type="STRING"/>
+                                 <property expression="$body/jsonObject/renewalTerm" name="renewalTerm" scope="default" type="STRING"/>
+                                 <property expression="$body/jsonObject/renewalTermPeriodType" name="renewalTermPeriodType" scope="default" type="STRING"/>
+                                 <property expression="$body/jsonObject/autoRenew" name="autoRenew" scope="default" type="STRING"/>
+                                 <property expression="$body/jsonObject/id" name="amendmentResponseId" scope="default" type="STRING"/>
+                                 <enrich>
+                                    <source clone="true" type="property" property="OriginalSubscription"/>
+                                    <target action="replace" type="body" xpath="$body/*"/>
+                                 </enrich>
+                                 <property name="logText" scope="default" type="STRING" value="****Condition:MatchTheFiledsAgainstRecordwithVersion1****"/>
+                                 <log level="custom">
+                                    <property expression="$body/*" name="*** BeforeComparing***"/>
+                                 </log>
+                                 <!--XSLT to compare getAmendmentBySubscription response and Zuora query call-->
+                                 <xslt key="gov:xslts/EBILL-Subscription/2.4/BaseversionDataComparision.xslt">
+                                    <property expression="$ctx:type" name="type" scope="default" type="STRING"/>
+                                    <property expression="$ctx:SubscriptionConfig/*[local-name()='amendmentType']/text()" name="TermsAndConditions" scope="default" type="STRING"/>
+                                    <property expression="$ctx:termType" name="termType" scope="default" type="STRING"/>
+                                    <property expression="$ctx:currentTerm" name="currentTerm" scope="default" type="STRING"/>
+                                    <property expression="$ctx:currentTermPeriodType" name="currentTermPeriodType" scope="default" type="STRING"/>
+                                    <property expression="$ctx:renewalSetting" name="renewalSetting" scope="default" type="STRING"/>
+                                    <property expression="$ctx:renewalTerm" name="renewalTerm" scope="default" type="STRING"/>
+                                    <property expression="$ctx:renewalTermPeriodType" name="renewalTermPeriodType" scope="default" type="STRING"/>
+                                    <property expression="$ctx:autoRenew" name="autoRenew" scope="default" type="STRING"/>
+                                    <property expression="$body/OriginalSubscription/records/TermType/text()" name="OriginalSubscriptiontermType" scope="default" type="STRING"/>
+                                    <property expression="$body/OriginalSubscription/records/CurrentTerm/text()" name="OriginalSubscriptionCurrentTerm" scope="default" type="STRING"/>
+                                    <property expression="$body/OriginalSubscription/records/CurrentTermPeriodType/text()" name="OriginalSubscriptionCurrentTermPeriodType" scope="default" type="STRING"/>
+                                    <property expression="$body/OriginalSubscription/records/RenewalSetting/text()" name="OriginalSubscriptionRenewalSetting" scope="default" type="STRING"/>
+                                    <property expression="$body/OriginalSubscription/records/RenewalTerm/text()" name="OriginalSubscriptionRenewalTerm" scope="default" type="STRING"/>
+                                    <property expression="$body/OriginalSubscription/records/RenewalTermPeriodType/text()" name="OriginalSubscriptionRenewalTermPeriodType" scope="default" type="STRING"/>
+                                    <property expression="$body/OriginalSubscription/records/AutoRenew/text()" name="OriginalSubscriptionautoRenew" scope="default" type="STRING"/>
+                                 </xslt>
+                                 <log level="custom">
+                                    <property expression="$body/*" name="***AfterComparing***"/>
+                                 </log>
+                                 <property name="faultdescription" expression="$body/QueryAResponseComparision/faultdescription/text()" scope="default"/>
+                                 <!--Filter to check if any mismatch in response fields of getAmendmentBySubscription response and Zuora query call-->
+                                 <filter xpath="string-length($ctx:faultdescription)!=0">
+                                    <then>
+                                       <property name="logText" scope="default" type="STRING" value="****Condition:CompleteMatch:No****"/>
+                                       <property name="code" scope="default" type="STRING" value="NOT_POSTPONE"/>
+                                       <property expression="$ctx:SubscriptionConfig/*[local-name()='faultCode']/*[local-name()='existAmend']/text()" name="description" scope="default" type="STRING"/>
+                                       <sequence key="EBILL-PostponeSubscriptionFault-2_4"/>
+                                    </then>
+                                    <else>
+                                       <property name="logText" scope="default" type="STRING" value="****Condition:CompleteMatch:Yes****"/>
+                                       <log level="custom">
+                                          <property expression="$body/*" name="***Delete Amendment call when comparision success***"/>
+                                          <property expression="$ctx:maxVersionId" name="uri.var.zuora.amendmentKey" scope="default" type="STRING"/>
+                                       </log>
+                                       <property expression="$ctx:sessionId" name="zuorasoap.sessionId" scope="default" type="STRING"/>
+                                       <property expression="$ctx:amendmentResponseId" name="uri.var.zuora.amendmentKey" scope="default" type="STRING"/>
+                                       <property name="HTTP_METHOD" scope="axis2" type="STRING" value="DELETE"/>
+                                       <header name="NO_KEEPALIVE" scope="transport" value="true"/>
+                                       <property expression="fn:concat('ZSession ', get-property('zuorasoap.sessionId'))" name="Authorization" scope="transport" type="STRING"/>
+                                       <property action="remove" name="Content-Type" scope="transport"/>
+                                       <property action="remove" name="Content-Encoding" scope="transport"/>
+                                       <!--Skipping retry-->
+                                       <property name="FORCE_ERROR_ON_SOAP_FAULT" scope="default" type="STRING" value="false"/>
+                                       <property name="NO_ENTITY_BODY" value="true" scope="axis2" type="BOOLEAN"/>
+                                       <log level="custom">
+                                          <property expression="concat(get-property('uri.var.zuora.apiUrl'),'/',get-property('uri.var.zuora.apiVersion'),'/object/amendment/',get-property('uri.var.zuora.amendmentKey'))" name="**** Delete-Amend-URL-Request-Zuora ****"/>
+                                       </log>
+                                       <!--Calling Delete subscription service-->
+                                       <call>
+                                          <endpoint>
+                                             <http method="delete" trace="disable" uri-template="{+uri.var.zuora.apiUrl}/{+uri.var.zuora.apiVersion}/object/amendment/{+uri.var.zuora.amendmentKey}"/>
+                                          </endpoint>
+                                       </call>
+                                       <log level="custom">
+                                          <property expression="$body/*" name="***After Delete Call****"/>
+                                       </log>
+                                       <!--Filter to check success response-->
+                                       <filter regex="true" source="boolean(contains($axis2:HTTP_SC,'200'))">
+                                          <then>
+                                             <property name="logText" scope="default" type="STRING" value="****Condition:DeleteAmendmentCallSuccess:Yes****"/>
+                                             <enrich>
+                                                <source clone="true" type="property" property="OriginalSubscription"/>
+                                                <target action="replace" type="body" xpath="$body/*"/>
+                                             </enrich>
+                                             <sequence key="EBILL-PostponseSubscriptionPartB"/>
+                                          </then>
+                                          <else>
+                                             <property name="logText" scope="default" type="STRING" value="****Condition:DeleteAmendmentCallSuccess:No****"/>
+                                             <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+                                             <property name="errorCode" scope="default" type="STRING" expression="$body/jsonObject/errors/code/text()"/>
+                                             <property name="errorDescription" scope="default" type="STRING" expression="$body/jsonObject/errors/Message/text()"/>
+                                             <sequence key="EBILL-PostponeSubscriptionFault-2_4"/>
+                                          </else>
+                                       </filter>
+                                    </else>
+                                 </filter>
+                              </else>
+                           </filter>
+                        </else>
+                     </filter>
+                  </else>
+               </filter>
+            </else>
+         </filter>
+      </then>
+      <else>
+         <log level="custom">
+            <property value="****Condition:NoRecordsFoundInZuoraQueryCall****" name="****" scope="default" type="STRING"/>
+         </log>
+         <!--No record found in zuora query call-->
+         <property name="code" scope="default" type="STRING" value="NOT_FOUND"/>
+         <property name="description" scope="default" type="STRING" value="The provided input is not found"/>
+         <sequence key="EBILL-PostponeSubscriptionFault-2_4"/>
+      </else>
+   </filter>
+</sequence>

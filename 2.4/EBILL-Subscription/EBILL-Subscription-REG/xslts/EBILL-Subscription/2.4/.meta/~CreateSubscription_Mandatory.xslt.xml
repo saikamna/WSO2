@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?><resource name="CreateSubscription_Mandatory.xslt" isCollection="false" path="/_system/governance/xslts/EBILL-Subscription/2.4/2.4/CreateSubscription_Mandatory.xslt" registryUrl="https://localhost:9443/registry" status="added">
+    <mediaType>application/xslt+xml</mediaType>
+</resource>

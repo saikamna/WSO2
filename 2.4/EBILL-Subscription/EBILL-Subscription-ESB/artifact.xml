@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><artifacts>
+    <artifact name="EBILL-Subscription-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.api" version="2.4.0-SNAPSHOT" type="synapse/api" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/api/EBILL-Subscription-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-AmendSubscriptionFault-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-AmendSubscriptionFault-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-AmendSubscriptionIn-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-AmendSubscriptionIn-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-CancelSubscriptionFault-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-CancelSubscriptionFault-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-CancelSubscriptionIn-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-CancelSubscriptionIn-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-CancelSubscriptionResponse-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-CancelSubscriptionResponse-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-CreateSubscriptionsFault-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-CreateSubscriptionsFault-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-CreateSubscriptionsIn-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-CreateSubscriptionsIn-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-GetSubscriptionDetailsFault-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-GetSubscriptionDetailsFault-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-GetSubscriptionDetailsIn-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-GetSubscriptionDetailsIn-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-GetSubscriptionsByKeysFault-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-GetSubscriptionsByKeysFault-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-GetSubscriptionsByKeysIn-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-GetSubscriptionsByKeysIn-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-GetSubscriptionsFault-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-GetSubscriptionsFault-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-GetSubscriptionsIn-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-GetSubscriptionsIn-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-PreviewSubscriptionAmendmentsFault-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-PreviewSubscriptionAmendmentsFault-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-PreviewSubscriptionAmendmentsIn-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-PreviewSubscriptionAmendmentsIn-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-PreviewSubscriptionCreationFault-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-PreviewSubscriptionCreationFault-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-PreviewSubscriptionCreationIn-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-PreviewSubscriptionCreationIn-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-CancelSubscription-2_4_Config" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.local-entry" version="2.4.0-SNAPSHOT" type="synapse/local-entry" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/local-entries/EBILL-CancelSubscription-2_4_Config.xml</file>
+    </artifact>
+    <artifact name="EBILL-UpdateSubscriptionIn-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-UpdateSubscriptionIn-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-UpdateSubscriptionFault-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-UpdateSubscriptionFault-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-PostponeSubscriptionFault-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-PostponeSubscriptionFault-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-PostponeSubscriptionIn-2_4" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-PostponeSubscriptionIn-2_4.xml</file>
+    </artifact>
+    <artifact name="EBILL-SubscriptionConfig" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.local-entry" version="2.4.0-SNAPSHOT" type="synapse/local-entry" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/local-entries/EBILL-SubscriptionConfig.xml</file>
+    </artifact>
+    <artifact name="EBILL-PostponseSubscriptionPartB" groupId="com.schneider-electric.ifw.wso2esb.service.ebill.EBILL-Subscription.sequence" version="2.4.0-SNAPSHOT" type="synapse/sequence" serverRole="EnterpriseServiceBus">
+        <file>src/main/synapse-config/sequences/EBILL-PostponseSubscriptionPartB.xml</file>
+    </artifact>
+</artifacts>

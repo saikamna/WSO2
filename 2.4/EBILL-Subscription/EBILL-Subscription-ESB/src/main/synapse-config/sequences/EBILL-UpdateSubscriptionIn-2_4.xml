@@ -1,0 +1,132 @@
+<sequence name="EBILL-UpdateSubscriptionIn-2_4" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+   <sequence key="gov:sequences/common/1.0/IncomingRequestLogger.xml"/>
+   <sequence key="gov:sequences/common/1.0/IFWHeader.xml"/>
+   <!--Defining Path parameter in the property-->
+   <property expression="get-property('uri.var.subscriptionId')" name="subscriptionId" scope="default" type="STRING"/>
+   <property expression="get-property('operation','accept')" name="Accept" scope="transport" type="STRING"/>
+   <property expression="$trp:X-SE-IFW-EBILLAccessToken" name="OAuthToken" scope="default" type="STRING" xmlns:ns="http://org.apache.synapse/xsd"/>
+   <property expression="get-property('ZuoraRest-TokenConfig')" name="tokenConfig" scope="default" type="OM" xmlns:ns="http://org.apache.synapse/xsd"/>
+   <!--filter to check the access token is passed or not-->
+   <filter description="" xpath="string-length(get-property('OAuthToken')) = 0">
+   <then>
+    <!--property to store OAuthToken-->
+   <property expression="$ctx:tokenConfig//*[local-name()='OAuthToken']" name="OAuthToken" scope="default" type="STRING"/>
+   </then>
+   <else/>
+   </filter>
+   <!--property to store apiUrl-->
+   <property expression="$ctx:tokenConfig//*[local-name()='apiUrl']" name="uri.var.zuora.apiUrl" scope="default" type="STRING"/>
+   <!--property to store apiVersion-->
+   <property expression="$ctx:tokenConfig//*[local-name()='apiVersion']" name="uri.var.zuora.apiVersion" scope="default" type="STRING"/>
+   <property expression="concat('object/subscription/',$ctx:subscriptionId)" name="uri.var.operationName" scope="default" type="STRING"/>
+   <!-- <property name="NO_KEEPALIVE" scope="axis2" type="STRING" value="true"/>  -->
+   <property name="HTTP_METHOD" scope="axis2" type="STRING" value="PUT"/>
+   <header expression="concat('Basic ',$ctx:OAuthToken)" name="Authorization" scope="transport"/>
+   <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+   <xslt key="gov:xslts/common/1.0/GetLocalName.xslt"/>
+   <!--Transform input-->
+   <xslt key="gov:xslts/EBILL-Subscription/2.4/UpdateSubscription_Request.xslt"/>
+   <property name="messageType" scope="axis2" type="STRING" value="application/json"/>
+   <property name="ContentType" scope="axis2" type="STRING" value="application/json"/>
+   <payloadFactory media-type="json">
+      <format>$1</format>
+      <args>
+         <arg evaluator="json" expression="$.subscription"/>
+      </args>
+   </payloadFactory>
+   <!--back-end call-->
+   <call>
+	<endpoint>
+		<http method="put" trace="disable" uri-template="{+uri.var.zuora.apiUrl}/{+uri.var.zuora.apiVersion}/{+uri.var.operationName}">
+			<timeout>
+				<duration>30000</duration>
+				<responseAction>fault</responseAction>
+			</timeout>
+			<suspendOnFailure>
+				<errorCodes>-1</errorCodes>
+				<initialDuration>0</initialDuration>
+				<progressionFactor>1.0</progressionFactor>
+				<maximumDuration>0</maximumDuration>
+			</suspendOnFailure>
+			<markForSuspension>
+				<errorCodes>-1</errorCodes>
+			</markForSuspension>
+		</http>
+	</endpoint>
+</call>
+   <!--Filter to check success status-->
+   <filter xpath="$body/jsonObject/Success[contains(text(),'true')]">
+      <then>
+	  <!-- xslt to form the IFW response -->
+         <xslt key="gov:xslts/EBILL-Subscription/2.4/UpdateSubscription_Response.xslt"/>
+         <filter regex="application/xml" source="get-property('operation','accept')">
+            <then>
+             <property name="messageType" scope="axis2" type="STRING" value="application/xml"/>
+               <property name="ContentType" scope="axis2" type="STRING" value="application/xml"/>  
+            </then>
+            <else>
+			<payloadFactory media-type="json">
+                <format>$1</format>
+                <args>
+                    <arg evaluator="json" expression="$.subscription" literal="false"/>
+                </args>
+            </payloadFactory>
+			</else>
+         </filter>
+      </then>
+      <else>
+         <filter xpath="$body/jsonObject/Success[contains(text(),'false')]">
+            <then>
+               <property expression="$body/jsonObject/Errors/Code/text()" name="code" scope="default" type="STRING"/>
+               <property expression="$body/jsonObject/Errors/Message/text()" name="description" scope="default" type="STRING"/>
+               <xslt key="gov:xslts/common/1.0/businessError.xslt">
+                  <property expression="get-property('code')" name="code"/>
+                  <property expression="get-property('description')" name="description"/>
+               </xslt>
+               <sequence key="EBILL-UpdateSubscriptionFault-2_4"/>
+            </then>
+            <else>
+            <property expression="$axis2:HTTP_SC" name="httpStatusCode"
+                scope="default" type="STRING"/>
+            <!--handling 401 error-->       
+            <filter xpath="$ctx:httpStatusCode ='401'">
+                <then>
+                  <sequence key="EBILL-UpdateSubscriptionFault-2_4"/>  
+                </then>
+                <else/>
+            </filter>
+			 <property name="ERROR_CODE" scope="default" type="STRING" value="NOT_FOUND" />
+                     <property name="ERROR_MESSAGE" scope="default" type="STRING" value="The provided input is not found" />
+               <!--Fault Payload-->
+               <payloadFactory media-type="xml">
+                  <format>
+                     <fault xmlns="">
+                        <code>$1</code>
+                        <description>$2</description>
+                     </fault>
+                  </format>
+                  <args>
+                      <arg evaluator="xml" expression="get-property('ERROR_CODE')" />
+                           <arg evaluator="xml" expression="get-property('ERROR_MESSAGE')" />
+                  </args>
+               </payloadFactory>
+			     <property name="HTTP_SC" scope="axis2" type="STRING" value="404" />
+			<filter regex="application/xml" source="get-property('operation','accept')">
+            <then>
+			   <property name="messageType" scope="axis2" type="STRING" value="application/xml" />
+               <property name="ContentType" scope="axis2" type="STRING" value="application/xml" />
+            </then>
+            <else>
+               <property name="messageType" scope="axis2" type="STRING" value="application/json" />
+               <property name="ContentType" scope="axis2" type="STRING" value="application/json" />
+            </else>
+         </filter>
+		  <respond/>
+            </else>
+         </filter>
+      </else>
+   </filter>
+   <property name="logText" scope="default" type="STRING" value="Ebill-UpdateSubscription-Final-Response"/>
+   <sequence key="gov:sequences/common/1.0/CommonLogger.xml"/>
+   <respond/>
+</sequence>

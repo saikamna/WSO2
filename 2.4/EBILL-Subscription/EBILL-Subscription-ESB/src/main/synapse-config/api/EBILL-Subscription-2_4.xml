@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/rest/ebill/subscription/2.4"
+  name="EBILL-Subscription-2_4" xmlns="http://ws.apache.org/ns/synapse">
+  <resource faultSequence="EBILL-GetSubscriptionsByKeysFault-2_4"
+    inSequence="EBILL-GetSubscriptionsByKeysIn-2_4" methods="POST"
+    protocol="https" uri-template="/search">
+    <outSequence/>
+  </resource>
+  <resource faultSequence="EBILL-PreviewSubscriptionCreationFault-2_4"
+    inSequence="EBILL-PreviewSubscriptionCreationIn-2_4" methods="POST"
+    protocol="https" uri-template="/subscriptions/preview">
+    <outSequence/>
+  </resource>
+  <resource faultSequence="EBILL-GetSubscriptionsFault-2_4"
+    inSequence="EBILL-GetSubscriptionsIn-2_4" methods="POST"
+    protocol="https" uri-template="/subscriptions/search">
+    <outSequence/>
+  </resource>
+  <resource faultSequence="EBILL-GetSubscriptionDetailsFault-2_4"
+    inSequence="EBILL-GetSubscriptionDetailsIn-2_4" methods="GET"
+    protocol="https" uri-template="/subscriptions">
+    <outSequence/>
+  </resource>
+  <resource faultSequence="EBILL-CreateSubscriptionsFault-2_4"
+    inSequence="EBILL-CreateSubscriptionsIn-2_4" methods="POST"
+    protocol="https" uri-template="/subscriptions">
+    <outSequence/>
+  </resource>
+  <resource faultSequence="EBILL-AmendSubscriptionFault-2_4"
+    inSequence="EBILL-AmendSubscriptionIn-2_4" methods="PUT"
+    protocol="https" uri-template="/subscriptions">
+    <outSequence/>
+  </resource>
+  <resource faultSequence="EBILL-CancelSubscriptionFault-2_4"
+    inSequence="EBILL-CancelSubscriptionIn-2_4" methods="POST"
+    protocol="https" uri-template="/subscriptions/cancel">
+    <outSequence/>
+  </resource>
+  <resource faultSequence="EBILL-PreviewSubscriptionAmendmentsFault-2_4"
+    inSequence="EBILL-PreviewSubscriptionAmendmentsIn-2_4" methods="PUT"
+    protocol="https" uri-template="/subscriptions/preview">
+    <outSequence/>
+  </resource>
+   <resource faultSequence="EBILL-UpdateSubscriptionFault-2_4"
+    inSequence="EBILL-UpdateSubscriptionIn-2_4" methods="PUT"
+    protocol="https" uri-template="/subscription/{subscriptionId}">
+    <outSequence/>
+  </resource>
+   <resource faultSequence="EBILL-PostponeSubscriptionFault-2_4"
+    inSequence="EBILL-PostponeSubscriptionIn-2_4" methods="PUT"
+    protocol="https" uri-template="/subscriptions/postpone/{subscriptionName}">
+    <outSequence/>
+  </resource>
+</api>

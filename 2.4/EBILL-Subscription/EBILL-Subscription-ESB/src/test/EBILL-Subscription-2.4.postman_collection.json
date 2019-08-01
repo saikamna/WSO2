@@ -1,0 +1,1319 @@
+{
+	"variables": [],
+	"info": {
+		"name": "EBILL-Subscription-2.4",
+		"_postman_id": "3569ed39-4b29-1a07-cb0c-b8558c02f01a",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "UpdateSubscription",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"tests[\"Status code name has string\"] = responseCode.name.has(\"OK\");",
+							"",
+							"tests[\"Body matches string\"] = responseBody.has(\"2c92c0f969c8f15e0169de3a564b7c62\");",
+							"",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "https://10.155.35.19:8243/rest/ebill/subscription/2.4/subscriptions/2c92c0f969c8f15e0169de3a564b7c62",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/xml",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/xml",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer 6e813ffe29803ffc89e9480a037060f4",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<subscription>\r\n\t<assetSKU>assetSKU</assetSKU>\r\n</subscription>"
+				},
+				"description": ""
+			},
+			"response": [
+				{
+					"id": "39d9e138-e55b-41a7-9b1c-2c15a690a915",
+					"name": "UpdateSubscription-Invalid account id",
+					"originalRequest": {
+						"url": "https://10.236.130.49:8243/rest/ebill/subscription/2.4/subscription/2c92c0f969c8f15e0169de3a564b7c62",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<subscription>\r\n\t<accountId>12345</accountId>\r\n\t<autoRenew>true</autoRenew>\r\n\t<contractAcceptanceDate>2015-08-21</contractAcceptanceDate>\r\n\t<contractEffectiveDate>2015-08-21</contractEffectiveDate>\r\n\t<currentTermPeriodType>Month</currentTermPeriodType>\r\n\t<initialTerm>1234</initialTerm>\r\n\t<initialTermPeriodType>Month</initialTermPeriodType>\r\n\t<invoiceOwnerId>str1234</invoiceOwnerId>\r\n\t<isInvoiceSeparate>false</isInvoiceSeparate>\r\n\t<name>str1234</name>\r\n\t<notes>testing</notes>\r\n\t<renewalSetting>TERMED</renewalSetting>\r\n\t<renewalTerm>0</renewalTerm>\r\n\t<renewalTermPeriodType>Month</renewalTermPeriodType>\r\n\t<serviceActivationDate>2012-12-13</serviceActivationDate>\r\n\t<termStartDate>2012-12-13</termStartDate>\r\n\t<termType>TERMED</termType>\r\n\t<cpqBundleJsonIdQT>abc</cpqBundleJsonIdQT>\r\n\t<opportunityCloseDateQT>2012-12-13</opportunityCloseDateQT>\r\n\t<opportunityNameQT>abc</opportunityNameQT>\r\n\t<quoteBusinessTypeQT>xyz</quoteBusinessTypeQT>\r\n\t<quoteNumberQT>qwe</quoteNumberQT>\r\n\t<quoteTypeQT>xsw</quoteTypeQT>\r\n\t<orderModifiedBy>Harry</orderModifiedBy>\r\n\t<customerSubscriptionLabel>potter</customerSubscriptionLabel>\r\n\t<orderCreatedBy>joe</orderCreatedBy>\r\n\t<provisioningLastId>2015-09-15</provisioningLastId>\r\n\t<provisioningLastTimestamp>2016-09-13</provisioningLastTimestamp>\r\n\t<provisioningLastResult>Created</provisioningLastResult>\r\n\t<trial>Y</trial>\r\n\t<mailInfoNewSub>new</mailInfoNewSub>\r\n\t<costTypeValue>JHD</costTypeValue>\r\n\t<costType>Project</costType>\r\n\t<solarSite>SOLAR</solarSite>\r\n\t<renewalTriggerInfo2>abc</renewalTriggerInfo2>\r\n\t<renewalTriggerInfo1>abc</renewalTriggerInfo1>\r\n\t<customDateAttribute1>2015-09-15</customDateAttribute1>\r\n\t<customTextAttribute2>abc</customTextAttribute2>\r\n\t<customTextAttribute1>abc</customTextAttribute1>\r\n\t<gateManagerId>abc</gateManagerId>\r\n\t<zuoraContactId2>abc</zuoraContactId2>\r\n\t<customerPaymentReference>abc</customerPaymentReference>\r\n\t<coolOff>abc</coolOff>\r\n\t<nbMW>abc</nbMW>\r\n\t<referenceQuote>abc</referenceQuote>\r\n\t<installerEmail>abc@gmail.com</installerEmail>\r\n\t<sourcePurchase>SourcePurchase</sourcePurchase>\r\n\t<opportunity>abc</opportunity>\r\n\t<entity>FIO</entity>\r\n\t<provisionDate>2015-09-15</provisionDate>\r\n\t<assetSN>asset</assetSN>\r\n\t<assetSKU>assetSKU</assetSKU>\r\n\t<zuoraContactId1>12345</zuoraContactId1>\r\n</subscription>"
+						},
+						"description": ""
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"_postman_previewtype": "html",
+					"header": [
+						{
+							"key": "zuora-request-id",
+							"value": "8744ee2d-4169-490c-828c-b2ee7c594dfb"
+						},
+						{
+							"key": "X-Kong-Upstream-Latency",
+							"value": "49"
+						},
+						{
+							"key": "X-Kong-Proxy-Latency",
+							"value": "0"
+						},
+						{
+							"key": "X-SE-IFW-RequestId",
+							"value": "2861656b-8097-4ec4-a0cc-eb098fea986e"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 08 Apr 2019 09:38:40 GMT"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "Close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"fault\": {\n        \"code\": \"INVALID_VALUE\",\n        \"description\": \"Invalid value for field AccountId: 12345\"\n    }\n}"
+				},
+				{
+					"id": "2139e22f-c4d0-4a23-98ee-51b8fbb7a6df",
+					"name": "UpdateSubscription-Invalid InvoiceOwnerid",
+					"originalRequest": {
+						"url": "https://10.236.130.49:8243/rest/ebill/subscription/2.4/subscription/2c92c0f969c8f15e0169de3a564b7c62",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/xml",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<subscription>\r\n\t<accountId>2c92c0f869522d31016952bd83cc5db9</accountId>\r\n\t<autoRenew>true</autoRenew>\r\n\t<contractAcceptanceDate>2015-08-21</contractAcceptanceDate>\r\n\t<contractEffectiveDate>2015-08-21</contractEffectiveDate>\r\n\t<currentTermPeriodType>Month</currentTermPeriodType>\r\n\t<initialTerm>1234</initialTerm>\r\n\t<initialTermPeriodType>Month</initialTermPeriodType>\r\n\t<invoiceOwnerId>str1234</invoiceOwnerId>\r\n\t<isInvoiceSeparate>false</isInvoiceSeparate>\r\n\t<name>str1234</name>\r\n\t<notes>testing</notes>\r\n\t<renewalSetting>TERMED</renewalSetting>\r\n\t<renewalTerm>0</renewalTerm>\r\n\t<renewalTermPeriodType>Month</renewalTermPeriodType>\r\n\t<serviceActivationDate>2012-12-13</serviceActivationDate>\r\n\t<termStartDate>2012-12-13</termStartDate>\r\n\t<termType>TERMED</termType>\r\n\t<cpqBundleJsonIdQT>abc</cpqBundleJsonIdQT>\r\n\t<opportunityCloseDateQT>2012-12-13</opportunityCloseDateQT>\r\n\t<opportunityNameQT>abc</opportunityNameQT>\r\n\t<quoteBusinessTypeQT>xyz</quoteBusinessTypeQT>\r\n\t<quoteNumberQT>qwe</quoteNumberQT>\r\n\t<quoteTypeQT>xsw</quoteTypeQT>\r\n\t<orderModifiedBy>Harry</orderModifiedBy>\r\n\t<customerSubscriptionLabel>potter</customerSubscriptionLabel>\r\n\t<orderCreatedBy>joe</orderCreatedBy>\r\n\t<provisioningLastId>2015-09-15</provisioningLastId>\r\n\t<provisioningLastTimestamp>2016-09-13</provisioningLastTimestamp>\r\n\t<provisioningLastResult>Created</provisioningLastResult>\r\n\t<trial>Y</trial>\r\n\t<mailInfoNewSub>new</mailInfoNewSub>\r\n\t<costTypeValue>JHD</costTypeValue>\r\n\t<costType>Project</costType>\r\n\t<solarSite>SOLAR</solarSite>\r\n\t<renewalTriggerInfo2>abc</renewalTriggerInfo2>\r\n\t<renewalTriggerInfo1>abc</renewalTriggerInfo1>\r\n\t<customDateAttribute1>2015-09-15</customDateAttribute1>\r\n\t<customTextAttribute2>abc</customTextAttribute2>\r\n\t<customTextAttribute1>abc</customTextAttribute1>\r\n\t<gateManagerId>abc</gateManagerId>\r\n\t<zuoraContactId2>abc</zuoraContactId2>\r\n\t<customerPaymentReference>abc</customerPaymentReference>\r\n\t<coolOff>abc</coolOff>\r\n\t<nbMW>abc</nbMW>\r\n\t<referenceQuote>abc</referenceQuote>\r\n\t<installerEmail>abc@gmail.com</installerEmail>\r\n\t<sourcePurchase>SourcePurchase</sourcePurchase>\r\n\t<opportunity>abc</opportunity>\r\n\t<entity>FIO</entity>\r\n\t<provisionDate>2015-09-15</provisionDate>\r\n\t<assetSN>asset</assetSN>\r\n\t<assetSKU>assetSKU</assetSKU>\r\n\t<zuoraContactId1>12345</zuoraContactId1>\r\n</subscription>"
+						},
+						"description": ""
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "xml",
+					"_postman_previewtype": "html",
+					"header": [
+						{
+							"key": "zuora-request-id",
+							"value": "0e6a1cd3-e0e0-45db-b51e-d94532ca670f"
+						},
+						{
+							"key": "X-Kong-Upstream-Latency",
+							"value": "48"
+						},
+						{
+							"key": "X-Kong-Proxy-Latency",
+							"value": "0"
+						},
+						{
+							"key": "X-SE-IFW-RequestId",
+							"value": "23f0e084-2b6f-4262-8ccb-1661a51175fb"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/xml; charset=utf-8"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 08 Apr 2019 09:40:28 GMT"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "Close"
+						}
+					],
+					"cookie": [],
+					"body": "<fault>\n    <code>INVALID_VALUE</code>\n    <description>Invalid value for field InvoiceOwnerId: str1234</description>\n</fault>"
+				},
+				{
+					"id": "56597f16-f544-425e-afee-4ad34e389e96",
+					"name": "UpdateSubscription-Invalid renewal setting",
+					"originalRequest": {
+						"url": "https://10.236.130.49:8243/rest/ebill/subscription/2.4/subscription/2c92c0f969c8f15e0169de3a564b7c62",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/xml",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<subscription>\r\n\t<accountId>2c92c0f869522d31016952bd83cc5db9</accountId>\r\n\t<autoRenew>true</autoRenew>\r\n\t<contractAcceptanceDate>2015-08-21</contractAcceptanceDate>\r\n\t<contractEffectiveDate>2015-08-21</contractEffectiveDate>\r\n\t<currentTermPeriodType>Month</currentTermPeriodType>\r\n\t<initialTerm>1234</initialTerm>\r\n\t<initialTermPeriodType>Month</initialTermPeriodType>\r\n\t<invoiceOwnerId>2c92c0f869522d31016952bd83cc5db9</invoiceOwnerId>\r\n\t<isInvoiceSeparate>false</isInvoiceSeparate>\r\n\t<name>str1234</name>\r\n\t<notes>testing</notes>\r\n\t<renewalSetting>TERMED</renewalSetting>\r\n\t<renewalTerm>0</renewalTerm>\r\n\t<renewalTermPeriodType>Month</renewalTermPeriodType>\r\n\t<serviceActivationDate>2012-12-13</serviceActivationDate>\r\n\t<termStartDate>2012-12-13</termStartDate>\r\n\t<termType>TERMED</termType>\r\n\t<cpqBundleJsonIdQT>abc</cpqBundleJsonIdQT>\r\n\t<opportunityCloseDateQT>2012-12-13</opportunityCloseDateQT>\r\n\t<opportunityNameQT>abc</opportunityNameQT>\r\n\t<quoteBusinessTypeQT>xyz</quoteBusinessTypeQT>\r\n\t<quoteNumberQT>qwe</quoteNumberQT>\r\n\t<quoteTypeQT>xsw</quoteTypeQT>\r\n\t<orderModifiedBy>Harry</orderModifiedBy>\r\n\t<customerSubscriptionLabel>potter</customerSubscriptionLabel>\r\n\t<orderCreatedBy>joe</orderCreatedBy>\r\n\t<provisioningLastId>2015-09-15</provisioningLastId>\r\n\t<provisioningLastTimestamp>2016-09-13</provisioningLastTimestamp>\r\n\t<provisioningLastResult>Created</provisioningLastResult>\r\n\t<trial>Y</trial>\r\n\t<mailInfoNewSub>new</mailInfoNewSub>\r\n\t<costTypeValue>JHD</costTypeValue>\r\n\t<costType>Project</costType>\r\n\t<solarSite>SOLAR</solarSite>\r\n\t<renewalTriggerInfo2>abc</renewalTriggerInfo2>\r\n\t<renewalTriggerInfo1>abc</renewalTriggerInfo1>\r\n\t<customDateAttribute1>2015-09-15</customDateAttribute1>\r\n\t<customTextAttribute2>abc</customTextAttribute2>\r\n\t<customTextAttribute1>abc</customTextAttribute1>\r\n\t<gateManagerId>abc</gateManagerId>\r\n\t<zuoraContactId2>abc</zuoraContactId2>\r\n\t<customerPaymentReference>abc</customerPaymentReference>\r\n\t<coolOff>abc</coolOff>\r\n\t<nbMW>abc</nbMW>\r\n\t<referenceQuote>abc</referenceQuote>\r\n\t<installerEmail>abc@gmail.com</installerEmail>\r\n\t<sourcePurchase>SourcePurchase</sourcePurchase>\r\n\t<opportunity>abc</opportunity>\r\n\t<entity>FIO</entity>\r\n\t<provisionDate>2015-09-15</provisionDate>\r\n\t<assetSN>asset</assetSN>\r\n\t<assetSKU>assetSKU</assetSKU>\r\n\t<zuoraContactId1>12345</zuoraContactId1>\r\n</subscription>"
+						},
+						"description": ""
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "xml",
+					"_postman_previewtype": "html",
+					"header": [
+						{
+							"key": "zuora-request-id",
+							"value": "47ea56b8-548b-40ab-9866-cd1d2cc30d9a"
+						},
+						{
+							"key": "X-Kong-Upstream-Latency",
+							"value": "76"
+						},
+						{
+							"key": "X-Kong-Proxy-Latency",
+							"value": "0"
+						},
+						{
+							"key": "X-SE-IFW-RequestId",
+							"value": "92ce04cf-b059-4da5-9650-069566c2db66"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/xml; charset=utf-8"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 08 Apr 2019 09:42:01 GMT"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "Close"
+						}
+					],
+					"cookie": [],
+					"body": "<fault>\n    <code>INVALID_VALUE</code>\n    <description>invalid value for field RenewalSetting: TERMED</description>\n</fault>"
+				},
+				{
+					"id": "36555b7c-3a12-474c-8369-78792b61ffdb",
+					"name": "UpdateSubscription-Invalid access token",
+					"originalRequest": {
+						"url": "https://10.236.130.49:8243/rest/ebill/subscription/2.4/subscription/2c92c0f969c8f15e0169de3a564b7c62",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "X-SE-IFW-EBILLAccessToken",
+								"value": "123324435547",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<subscription>\r\n\t<accountId>2c92c0f869522d31016952bd83cc5db9</accountId>\r\n\t<autoRenew>true</autoRenew>\r\n\t<contractAcceptanceDate>2015-08-21</contractAcceptanceDate>\r\n\t<contractEffectiveDate>2015-08-21</contractEffectiveDate>\r\n\t<currentTermPeriodType>Month</currentTermPeriodType>\r\n\t<initialTerm>1234</initialTerm>\r\n\t<initialTermPeriodType>Month</initialTermPeriodType>\r\n\t<invoiceOwnerId>2c92c0f869522d31016952bd83cc5db9</invoiceOwnerId>\r\n\t<isInvoiceSeparate>false</isInvoiceSeparate>\r\n\t<name>str1234</name>\r\n\t<notes>testing</notes>\r\n\t<renewalSetting>Renew With Specific Term</renewalSetting>\r\n\t<renewalTerm>0</renewalTerm>\r\n\t<renewalTermPeriodType>Month</renewalTermPeriodType>\r\n\t<serviceActivationDate>2012-12-13</serviceActivationDate>\r\n\t<termStartDate>2012-12-13</termStartDate>\r\n\t<termType>TERMED</termType>\r\n\t<cpqBundleJsonIdQT>abc</cpqBundleJsonIdQT>\r\n\t<opportunityCloseDateQT>2012-12-13</opportunityCloseDateQT>\r\n\t<opportunityNameQT>abc</opportunityNameQT>\r\n\t<quoteBusinessTypeQT>xyz</quoteBusinessTypeQT>\r\n\t<quoteNumberQT>qwe</quoteNumberQT>\r\n\t<quoteTypeQT>xsw</quoteTypeQT>\r\n\t<orderModifiedBy>Harry</orderModifiedBy>\r\n\t<customerSubscriptionLabel>potter</customerSubscriptionLabel>\r\n\t<orderCreatedBy>joe</orderCreatedBy>\r\n\t<provisioningLastId>2015-09-15</provisioningLastId>\r\n\t<provisioningLastTimestamp>2016-09-13</provisioningLastTimestamp>\r\n\t<provisioningLastResult>Created</provisioningLastResult>\r\n\t<trial>Y</trial>\r\n\t<mailInfoNewSub>new</mailInfoNewSub>\r\n\t<costTypeValue>JHD</costTypeValue>\r\n\t<costType>Project</costType>\r\n\t<solarSite>SOLAR</solarSite>\r\n\t<renewalTriggerInfo2>abc</renewalTriggerInfo2>\r\n\t<renewalTriggerInfo1>abc</renewalTriggerInfo1>\r\n\t<customDateAttribute1>2015-09-15</customDateAttribute1>\r\n\t<customTextAttribute2>abc</customTextAttribute2>\r\n\t<customTextAttribute1>abc</customTextAttribute1>\r\n\t<gateManagerId>abc</gateManagerId>\r\n\t<zuoraContactId2>abc</zuoraContactId2>\r\n\t<customerPaymentReference>abc</customerPaymentReference>\r\n\t<coolOff>abc</coolOff>\r\n\t<nbMW>abc</nbMW>\r\n\t<referenceQuote>abc</referenceQuote>\r\n\t<installerEmail>abc@gmail.com</installerEmail>\r\n\t<sourcePurchase>SourcePurchase</sourcePurchase>\r\n\t<opportunity>abc</opportunity>\r\n\t<entity>FIO</entity>\r\n\t<provisionDate>2015-09-15</provisionDate>\r\n\t<assetSN>asset</assetSN>\r\n\t<assetSKU>assetSKU</assetSKU>\r\n\t<zuoraContactId1>12345</zuoraContactId1>\r\n</subscription>"
+						},
+						"description": ""
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "xml",
+					"_postman_previewtype": "html",
+					"header": [
+						{
+							"key": "zuora-request-id",
+							"value": "066c5750-8ae8-40b3-92b2-0f2859c9c402"
+						},
+						{
+							"key": "WWW-Authenticate",
+							"value": "Basic realm=Zuora API, ZSession realm=Zuora API, Bearer realm=Zuora API"
+						},
+						{
+							"key": "X-Kong-Upstream-Latency",
+							"value": "2"
+						},
+						{
+							"key": "X-Kong-Proxy-Latency",
+							"value": "0"
+						},
+						{
+							"key": "X-SE-IFW-RequestId",
+							"value": "2ec99f77-1240-4171-83f7-cf9a2c8be8b6"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/xml; charset=utf-8"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 08 Apr 2019 10:14:44 GMT"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "<fault>\n    <code>INVALID_ACCESS_TOKEN</code>\n    <description>The provided access token is invalid</description>\n</fault>"
+				}
+			]
+		},
+		{
+			"name": "VC-UpdateSubscription-Invalid access token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"tests[\"Status code name has string\"] = responseCode.name.has(\"Bad Request\");",
+							"",
+							"tests[\"Body matches string\"] = responseBody.has(\"INVALID_VALUE\");",
+							"",
+							"tests[\"Body matches string\"] = responseBody.has(\"Wrong pick list value: abc for field CoolOff__c.\");",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "https://10.155.35.19:8243/rest/ebill/subscription/2.4/subscriptions/2c92c0f969c8f15e0169de3a564b7c62",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 6e813ffe29803ffc89e9480a037060f4",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/xml",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/xml",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<subscription>\r\n\t<invoiceOwnerId>2c92c0f869522d31016952bd83cc5db9</invoiceOwnerId>\r\n\t <coolOff>abc</coolOff>\r\n    <costType>Project</costType>\r\n</subscription>"
+				},
+				"description": ""
+			},
+			"response": [
+				{
+					"id": "961c0027-3227-4465-a918-0afc3b36d0f6",
+					"name": "UpdateSubscription-Invalid InvoiceOwnerid",
+					"originalRequest": {
+						"url": "https://10.236.130.49:8243/rest/ebill/subscription/2.4/subscription/2c92c0f969c8f15e0169de3a564b7c62",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/xml",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<subscription>\r\n\t<accountId>2c92c0f869522d31016952bd83cc5db9</accountId>\r\n\t<autoRenew>true</autoRenew>\r\n\t<contractAcceptanceDate>2015-08-21</contractAcceptanceDate>\r\n\t<contractEffectiveDate>2015-08-21</contractEffectiveDate>\r\n\t<currentTermPeriodType>Month</currentTermPeriodType>\r\n\t<initialTerm>1234</initialTerm>\r\n\t<initialTermPeriodType>Month</initialTermPeriodType>\r\n\t<invoiceOwnerId>str1234</invoiceOwnerId>\r\n\t<isInvoiceSeparate>false</isInvoiceSeparate>\r\n\t<name>str1234</name>\r\n\t<notes>testing</notes>\r\n\t<renewalSetting>TERMED</renewalSetting>\r\n\t<renewalTerm>0</renewalTerm>\r\n\t<renewalTermPeriodType>Month</renewalTermPeriodType>\r\n\t<serviceActivationDate>2012-12-13</serviceActivationDate>\r\n\t<termStartDate>2012-12-13</termStartDate>\r\n\t<termType>TERMED</termType>\r\n\t<cpqBundleJsonIdQT>abc</cpqBundleJsonIdQT>\r\n\t<opportunityCloseDateQT>2012-12-13</opportunityCloseDateQT>\r\n\t<opportunityNameQT>abc</opportunityNameQT>\r\n\t<quoteBusinessTypeQT>xyz</quoteBusinessTypeQT>\r\n\t<quoteNumberQT>qwe</quoteNumberQT>\r\n\t<quoteTypeQT>xsw</quoteTypeQT>\r\n\t<orderModifiedBy>Harry</orderModifiedBy>\r\n\t<customerSubscriptionLabel>potter</customerSubscriptionLabel>\r\n\t<orderCreatedBy>joe</orderCreatedBy>\r\n\t<provisioningLastId>2015-09-15</provisioningLastId>\r\n\t<provisioningLastTimestamp>2016-09-13</provisioningLastTimestamp>\r\n\t<provisioningLastResult>Created</provisioningLastResult>\r\n\t<trial>Y</trial>\r\n\t<mailInfoNewSub>new</mailInfoNewSub>\r\n\t<costTypeValue>JHD</costTypeValue>\r\n\t<costType>Project</costType>\r\n\t<solarSite>SOLAR</solarSite>\r\n\t<renewalTriggerInfo2>abc</renewalTriggerInfo2>\r\n\t<renewalTriggerInfo1>abc</renewalTriggerInfo1>\r\n\t<customDateAttribute1>2015-09-15</customDateAttribute1>\r\n\t<customTextAttribute2>abc</customTextAttribute2>\r\n\t<customTextAttribute1>abc</customTextAttribute1>\r\n\t<gateManagerId>abc</gateManagerId>\r\n\t<zuoraContactId2>abc</zuoraContactId2>\r\n\t<customerPaymentReference>abc</customerPaymentReference>\r\n\t<coolOff>abc</coolOff>\r\n\t<nbMW>abc</nbMW>\r\n\t<referenceQuote>abc</referenceQuote>\r\n\t<installerEmail>abc@gmail.com</installerEmail>\r\n\t<sourcePurchase>SourcePurchase</sourcePurchase>\r\n\t<opportunity>abc</opportunity>\r\n\t<entity>FIO</entity>\r\n\t<provisionDate>2015-09-15</provisionDate>\r\n\t<assetSN>asset</assetSN>\r\n\t<assetSKU>assetSKU</assetSKU>\r\n\t<zuoraContactId1>12345</zuoraContactId1>\r\n</subscription>"
+						},
+						"description": ""
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "xml",
+					"_postman_previewtype": "html",
+					"header": [
+						{
+							"key": "zuora-request-id",
+							"value": "0e6a1cd3-e0e0-45db-b51e-d94532ca670f"
+						},
+						{
+							"key": "X-Kong-Upstream-Latency",
+							"value": "48"
+						},
+						{
+							"key": "X-Kong-Proxy-Latency",
+							"value": "0"
+						},
+						{
+							"key": "X-SE-IFW-RequestId",
+							"value": "23f0e084-2b6f-4262-8ccb-1661a51175fb"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/xml; charset=utf-8"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 08 Apr 2019 09:40:28 GMT"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "Close"
+						}
+					],
+					"cookie": [],
+					"body": "<fault>\n    <code>INVALID_VALUE</code>\n    <description>Invalid value for field InvoiceOwnerId: str1234</description>\n</fault>"
+				},
+				{
+					"id": "e0b5da0f-e2c4-4d85-98a7-1326a17592e0",
+					"name": "UpdateSubscription-Invalid account id",
+					"originalRequest": {
+						"url": "https://10.236.130.49:8243/rest/ebill/subscription/2.4/subscription/2c92c0f969c8f15e0169de3a564b7c62",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<subscription>\r\n\t<accountId>12345</accountId>\r\n\t<autoRenew>true</autoRenew>\r\n\t<contractAcceptanceDate>2015-08-21</contractAcceptanceDate>\r\n\t<contractEffectiveDate>2015-08-21</contractEffectiveDate>\r\n\t<currentTermPeriodType>Month</currentTermPeriodType>\r\n\t<initialTerm>1234</initialTerm>\r\n\t<initialTermPeriodType>Month</initialTermPeriodType>\r\n\t<invoiceOwnerId>str1234</invoiceOwnerId>\r\n\t<isInvoiceSeparate>false</isInvoiceSeparate>\r\n\t<name>str1234</name>\r\n\t<notes>testing</notes>\r\n\t<renewalSetting>TERMED</renewalSetting>\r\n\t<renewalTerm>0</renewalTerm>\r\n\t<renewalTermPeriodType>Month</renewalTermPeriodType>\r\n\t<serviceActivationDate>2012-12-13</serviceActivationDate>\r\n\t<termStartDate>2012-12-13</termStartDate>\r\n\t<termType>TERMED</termType>\r\n\t<cpqBundleJsonIdQT>abc</cpqBundleJsonIdQT>\r\n\t<opportunityCloseDateQT>2012-12-13</opportunityCloseDateQT>\r\n\t<opportunityNameQT>abc</opportunityNameQT>\r\n\t<quoteBusinessTypeQT>xyz</quoteBusinessTypeQT>\r\n\t<quoteNumberQT>qwe</quoteNumberQT>\r\n\t<quoteTypeQT>xsw</quoteTypeQT>\r\n\t<orderModifiedBy>Harry</orderModifiedBy>\r\n\t<customerSubscriptionLabel>potter</customerSubscriptionLabel>\r\n\t<orderCreatedBy>joe</orderCreatedBy>\r\n\t<provisioningLastId>2015-09-15</provisioningLastId>\r\n\t<provisioningLastTimestamp>2016-09-13</provisioningLastTimestamp>\r\n\t<provisioningLastResult>Created</provisioningLastResult>\r\n\t<trial>Y</trial>\r\n\t<mailInfoNewSub>new</mailInfoNewSub>\r\n\t<costTypeValue>JHD</costTypeValue>\r\n\t<costType>Project</costType>\r\n\t<solarSite>SOLAR</solarSite>\r\n\t<renewalTriggerInfo2>abc</renewalTriggerInfo2>\r\n\t<renewalTriggerInfo1>abc</renewalTriggerInfo1>\r\n\t<customDateAttribute1>2015-09-15</customDateAttribute1>\r\n\t<customTextAttribute2>abc</customTextAttribute2>\r\n\t<customTextAttribute1>abc</customTextAttribute1>\r\n\t<gateManagerId>abc</gateManagerId>\r\n\t<zuoraContactId2>abc</zuoraContactId2>\r\n\t<customerPaymentReference>abc</customerPaymentReference>\r\n\t<coolOff>abc</coolOff>\r\n\t<nbMW>abc</nbMW>\r\n\t<referenceQuote>abc</referenceQuote>\r\n\t<installerEmail>abc@gmail.com</installerEmail>\r\n\t<sourcePurchase>SourcePurchase</sourcePurchase>\r\n\t<opportunity>abc</opportunity>\r\n\t<entity>FIO</entity>\r\n\t<provisionDate>2015-09-15</provisionDate>\r\n\t<assetSN>asset</assetSN>\r\n\t<assetSKU>assetSKU</assetSKU>\r\n\t<zuoraContactId1>12345</zuoraContactId1>\r\n</subscription>"
+						},
+						"description": ""
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"_postman_previewtype": "html",
+					"header": [
+						{
+							"key": "zuora-request-id",
+							"value": "8744ee2d-4169-490c-828c-b2ee7c594dfb"
+						},
+						{
+							"key": "X-Kong-Upstream-Latency",
+							"value": "49"
+						},
+						{
+							"key": "X-Kong-Proxy-Latency",
+							"value": "0"
+						},
+						{
+							"key": "X-SE-IFW-RequestId",
+							"value": "2861656b-8097-4ec4-a0cc-eb098fea986e"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 08 Apr 2019 09:38:40 GMT"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "Close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"fault\": {\n        \"code\": \"INVALID_VALUE\",\n        \"description\": \"Invalid value for field AccountId: 12345\"\n    }\n}"
+				},
+				{
+					"id": "125ad153-5bab-4337-8e54-f0e5ee11210b",
+					"name": "UpdateSubscription-Invalid access token",
+					"originalRequest": {
+						"url": "https://10.236.130.49:8243/rest/ebill/subscription/2.4/subscription/2c92c0f969c8f15e0169de3a564b7c62",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "X-SE-IFW-EBILLAccessToken",
+								"value": "123324435547",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<subscription>\r\n\t<accountId>2c92c0f869522d31016952bd83cc5db9</accountId>\r\n\t<autoRenew>true</autoRenew>\r\n\t<contractAcceptanceDate>2015-08-21</contractAcceptanceDate>\r\n\t<contractEffectiveDate>2015-08-21</contractEffectiveDate>\r\n\t<currentTermPeriodType>Month</currentTermPeriodType>\r\n\t<initialTerm>1234</initialTerm>\r\n\t<initialTermPeriodType>Month</initialTermPeriodType>\r\n\t<invoiceOwnerId>2c92c0f869522d31016952bd83cc5db9</invoiceOwnerId>\r\n\t<isInvoiceSeparate>false</isInvoiceSeparate>\r\n\t<name>str1234</name>\r\n\t<notes>testing</notes>\r\n\t<renewalSetting>Renew With Specific Term</renewalSetting>\r\n\t<renewalTerm>0</renewalTerm>\r\n\t<renewalTermPeriodType>Month</renewalTermPeriodType>\r\n\t<serviceActivationDate>2012-12-13</serviceActivationDate>\r\n\t<termStartDate>2012-12-13</termStartDate>\r\n\t<termType>TERMED</termType>\r\n\t<cpqBundleJsonIdQT>abc</cpqBundleJsonIdQT>\r\n\t<opportunityCloseDateQT>2012-12-13</opportunityCloseDateQT>\r\n\t<opportunityNameQT>abc</opportunityNameQT>\r\n\t<quoteBusinessTypeQT>xyz</quoteBusinessTypeQT>\r\n\t<quoteNumberQT>qwe</quoteNumberQT>\r\n\t<quoteTypeQT>xsw</quoteTypeQT>\r\n\t<orderModifiedBy>Harry</orderModifiedBy>\r\n\t<customerSubscriptionLabel>potter</customerSubscriptionLabel>\r\n\t<orderCreatedBy>joe</orderCreatedBy>\r\n\t<provisioningLastId>2015-09-15</provisioningLastId>\r\n\t<provisioningLastTimestamp>2016-09-13</provisioningLastTimestamp>\r\n\t<provisioningLastResult>Created</provisioningLastResult>\r\n\t<trial>Y</trial>\r\n\t<mailInfoNewSub>new</mailInfoNewSub>\r\n\t<costTypeValue>JHD</costTypeValue>\r\n\t<costType>Project</costType>\r\n\t<solarSite>SOLAR</solarSite>\r\n\t<renewalTriggerInfo2>abc</renewalTriggerInfo2>\r\n\t<renewalTriggerInfo1>abc</renewalTriggerInfo1>\r\n\t<customDateAttribute1>2015-09-15</customDateAttribute1>\r\n\t<customTextAttribute2>abc</customTextAttribute2>\r\n\t<customTextAttribute1>abc</customTextAttribute1>\r\n\t<gateManagerId>abc</gateManagerId>\r\n\t<zuoraContactId2>abc</zuoraContactId2>\r\n\t<customerPaymentReference>abc</customerPaymentReference>\r\n\t<coolOff>abc</coolOff>\r\n\t<nbMW>abc</nbMW>\r\n\t<referenceQuote>abc</referenceQuote>\r\n\t<installerEmail>abc@gmail.com</installerEmail>\r\n\t<sourcePurchase>SourcePurchase</sourcePurchase>\r\n\t<opportunity>abc</opportunity>\r\n\t<entity>FIO</entity>\r\n\t<provisionDate>2015-09-15</provisionDate>\r\n\t<assetSN>asset</assetSN>\r\n\t<assetSKU>assetSKU</assetSKU>\r\n\t<zuoraContactId1>12345</zuoraContactId1>\r\n</subscription>"
+						},
+						"description": ""
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "xml",
+					"_postman_previewtype": "html",
+					"header": [
+						{
+							"key": "zuora-request-id",
+							"value": "066c5750-8ae8-40b3-92b2-0f2859c9c402"
+						},
+						{
+							"key": "WWW-Authenticate",
+							"value": "Basic realm=Zuora API, ZSession realm=Zuora API, Bearer realm=Zuora API"
+						},
+						{
+							"key": "X-Kong-Upstream-Latency",
+							"value": "2"
+						},
+						{
+							"key": "X-Kong-Proxy-Latency",
+							"value": "0"
+						},
+						{
+							"key": "X-SE-IFW-RequestId",
+							"value": "2ec99f77-1240-4171-83f7-cf9a2c8be8b6"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/xml; charset=utf-8"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 08 Apr 2019 10:14:44 GMT"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "<fault>\n    <code>INVALID_ACCESS_TOKEN</code>\n    <description>The provided access token is invalid</description>\n</fault>"
+				},
+				{
+					"id": "7042424c-0f30-45d5-99ac-74eaa06bf13b",
+					"name": "UpdateSubscription-Invalid renewal setting",
+					"originalRequest": {
+						"url": "https://10.236.130.49:8243/rest/ebill/subscription/2.4/subscription/2c92c0f969c8f15e0169de3a564b7c62",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/xml",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<subscription>\r\n\t<accountId>2c92c0f869522d31016952bd83cc5db9</accountId>\r\n\t<autoRenew>true</autoRenew>\r\n\t<contractAcceptanceDate>2015-08-21</contractAcceptanceDate>\r\n\t<contractEffectiveDate>2015-08-21</contractEffectiveDate>\r\n\t<currentTermPeriodType>Month</currentTermPeriodType>\r\n\t<initialTerm>1234</initialTerm>\r\n\t<initialTermPeriodType>Month</initialTermPeriodType>\r\n\t<invoiceOwnerId>2c92c0f869522d31016952bd83cc5db9</invoiceOwnerId>\r\n\t<isInvoiceSeparate>false</isInvoiceSeparate>\r\n\t<name>str1234</name>\r\n\t<notes>testing</notes>\r\n\t<renewalSetting>TERMED</renewalSetting>\r\n\t<renewalTerm>0</renewalTerm>\r\n\t<renewalTermPeriodType>Month</renewalTermPeriodType>\r\n\t<serviceActivationDate>2012-12-13</serviceActivationDate>\r\n\t<termStartDate>2012-12-13</termStartDate>\r\n\t<termType>TERMED</termType>\r\n\t<cpqBundleJsonIdQT>abc</cpqBundleJsonIdQT>\r\n\t<opportunityCloseDateQT>2012-12-13</opportunityCloseDateQT>\r\n\t<opportunityNameQT>abc</opportunityNameQT>\r\n\t<quoteBusinessTypeQT>xyz</quoteBusinessTypeQT>\r\n\t<quoteNumberQT>qwe</quoteNumberQT>\r\n\t<quoteTypeQT>xsw</quoteTypeQT>\r\n\t<orderModifiedBy>Harry</orderModifiedBy>\r\n\t<customerSubscriptionLabel>potter</customerSubscriptionLabel>\r\n\t<orderCreatedBy>joe</orderCreatedBy>\r\n\t<provisioningLastId>2015-09-15</provisioningLastId>\r\n\t<provisioningLastTimestamp>2016-09-13</provisioningLastTimestamp>\r\n\t<provisioningLastResult>Created</provisioningLastResult>\r\n\t<trial>Y</trial>\r\n\t<mailInfoNewSub>new</mailInfoNewSub>\r\n\t<costTypeValue>JHD</costTypeValue>\r\n\t<costType>Project</costType>\r\n\t<solarSite>SOLAR</solarSite>\r\n\t<renewalTriggerInfo2>abc</renewalTriggerInfo2>\r\n\t<renewalTriggerInfo1>abc</renewalTriggerInfo1>\r\n\t<customDateAttribute1>2015-09-15</customDateAttribute1>\r\n\t<customTextAttribute2>abc</customTextAttribute2>\r\n\t<customTextAttribute1>abc</customTextAttribute1>\r\n\t<gateManagerId>abc</gateManagerId>\r\n\t<zuoraContactId2>abc</zuoraContactId2>\r\n\t<customerPaymentReference>abc</customerPaymentReference>\r\n\t<coolOff>abc</coolOff>\r\n\t<nbMW>abc</nbMW>\r\n\t<referenceQuote>abc</referenceQuote>\r\n\t<installerEmail>abc@gmail.com</installerEmail>\r\n\t<sourcePurchase>SourcePurchase</sourcePurchase>\r\n\t<opportunity>abc</opportunity>\r\n\t<entity>FIO</entity>\r\n\t<provisionDate>2015-09-15</provisionDate>\r\n\t<assetSN>asset</assetSN>\r\n\t<assetSKU>assetSKU</assetSKU>\r\n\t<zuoraContactId1>12345</zuoraContactId1>\r\n</subscription>"
+						},
+						"description": ""
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "xml",
+					"_postman_previewtype": "html",
+					"header": [
+						{
+							"key": "zuora-request-id",
+							"value": "47ea56b8-548b-40ab-9866-cd1d2cc30d9a"
+						},
+						{
+							"key": "X-Kong-Upstream-Latency",
+							"value": "76"
+						},
+						{
+							"key": "X-Kong-Proxy-Latency",
+							"value": "0"
+						},
+						{
+							"key": "X-SE-IFW-RequestId",
+							"value": "92ce04cf-b059-4da5-9650-069566c2db66"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/xml; charset=utf-8"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 08 Apr 2019 09:42:01 GMT"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "Close"
+						}
+					],
+					"cookie": [],
+					"body": "<fault>\n    <code>INVALID_VALUE</code>\n    <description>invalid value for field RenewalSetting: TERMED</description>\n</fault>"
+				}
+			]
+		},
+		{
+			"name": "VC1-UpdateSubscription-Invalid access token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"tests[\"Status code name has string\"] = responseCode.name.has(\"Unauthorized\");",
+							"",
+							"tests[\"Body matches string\"] = responseBody.has(\"INVALID_ACCESS_TOKEN\");",
+							"",
+							"tests[\"Body matches string\"] = responseBody.has(\"The provided access token is invalid\");",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "https://10.155.35.19:8243/rest/ebill/subscription/2.4/subscriptions/2c92c0f969c8f15e0169de3a564b7c62",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer 6e813ffe29803ffc89e9480a037060f4"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/xml"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/xml",
+						"disabled": true
+					},
+					{
+						"key": "X-SE-IFW-EBILLAccessToken",
+						"type": "text",
+						"value": "1234"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<subscription>\r\n\t<invoiceOwnerId>2c92c0f869522d31016952bd83cc5db9</invoiceOwnerId>\r\n    <costType>Project</costType>\r\n</subscription>"
+				},
+				"description": ""
+			},
+			"response": [
+				{
+					"id": "46abe448-06e0-4f46-bd46-2de90380d4cf",
+					"name": "UpdateSubscription-Invalid access token",
+					"originalRequest": {
+						"url": "https://10.236.130.49:8243/rest/ebill/subscription/2.4/subscription/2c92c0f969c8f15e0169de3a564b7c62",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "X-SE-IFW-EBILLAccessToken",
+								"value": "123324435547",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<subscription>\r\n\t<accountId>2c92c0f869522d31016952bd83cc5db9</accountId>\r\n\t<autoRenew>true</autoRenew>\r\n\t<contractAcceptanceDate>2015-08-21</contractAcceptanceDate>\r\n\t<contractEffectiveDate>2015-08-21</contractEffectiveDate>\r\n\t<currentTermPeriodType>Month</currentTermPeriodType>\r\n\t<initialTerm>1234</initialTerm>\r\n\t<initialTermPeriodType>Month</initialTermPeriodType>\r\n\t<invoiceOwnerId>2c92c0f869522d31016952bd83cc5db9</invoiceOwnerId>\r\n\t<isInvoiceSeparate>false</isInvoiceSeparate>\r\n\t<name>str1234</name>\r\n\t<notes>testing</notes>\r\n\t<renewalSetting>Renew With Specific Term</renewalSetting>\r\n\t<renewalTerm>0</renewalTerm>\r\n\t<renewalTermPeriodType>Month</renewalTermPeriodType>\r\n\t<serviceActivationDate>2012-12-13</serviceActivationDate>\r\n\t<termStartDate>2012-12-13</termStartDate>\r\n\t<termType>TERMED</termType>\r\n\t<cpqBundleJsonIdQT>abc</cpqBundleJsonIdQT>\r\n\t<opportunityCloseDateQT>2012-12-13</opportunityCloseDateQT>\r\n\t<opportunityNameQT>abc</opportunityNameQT>\r\n\t<quoteBusinessTypeQT>xyz</quoteBusinessTypeQT>\r\n\t<quoteNumberQT>qwe</quoteNumberQT>\r\n\t<quoteTypeQT>xsw</quoteTypeQT>\r\n\t<orderModifiedBy>Harry</orderModifiedBy>\r\n\t<customerSubscriptionLabel>potter</customerSubscriptionLabel>\r\n\t<orderCreatedBy>joe</orderCreatedBy>\r\n\t<provisioningLastId>2015-09-15</provisioningLastId>\r\n\t<provisioningLastTimestamp>2016-09-13</provisioningLastTimestamp>\r\n\t<provisioningLastResult>Created</provisioningLastResult>\r\n\t<trial>Y</trial>\r\n\t<mailInfoNewSub>new</mailInfoNewSub>\r\n\t<costTypeValue>JHD</costTypeValue>\r\n\t<costType>Project</costType>\r\n\t<solarSite>SOLAR</solarSite>\r\n\t<renewalTriggerInfo2>abc</renewalTriggerInfo2>\r\n\t<renewalTriggerInfo1>abc</renewalTriggerInfo1>\r\n\t<customDateAttribute1>2015-09-15</customDateAttribute1>\r\n\t<customTextAttribute2>abc</customTextAttribute2>\r\n\t<customTextAttribute1>abc</customTextAttribute1>\r\n\t<gateManagerId>abc</gateManagerId>\r\n\t<zuoraContactId2>abc</zuoraContactId2>\r\n\t<customerPaymentReference>abc</customerPaymentReference>\r\n\t<coolOff>abc</coolOff>\r\n\t<nbMW>abc</nbMW>\r\n\t<referenceQuote>abc</referenceQuote>\r\n\t<installerEmail>abc@gmail.com</installerEmail>\r\n\t<sourcePurchase>SourcePurchase</sourcePurchase>\r\n\t<opportunity>abc</opportunity>\r\n\t<entity>FIO</entity>\r\n\t<provisionDate>2015-09-15</provisionDate>\r\n\t<assetSN>asset</assetSN>\r\n\t<assetSKU>assetSKU</assetSKU>\r\n\t<zuoraContactId1>12345</zuoraContactId1>\r\n</subscription>"
+						},
+						"description": ""
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "xml",
+					"_postman_previewtype": "html",
+					"header": [
+						{
+							"key": "zuora-request-id",
+							"value": "066c5750-8ae8-40b3-92b2-0f2859c9c402"
+						},
+						{
+							"key": "WWW-Authenticate",
+							"value": "Basic realm=Zuora API, ZSession realm=Zuora API, Bearer realm=Zuora API"
+						},
+						{
+							"key": "X-Kong-Upstream-Latency",
+							"value": "2"
+						},
+						{
+							"key": "X-Kong-Proxy-Latency",
+							"value": "0"
+						},
+						{
+							"key": "X-SE-IFW-RequestId",
+							"value": "2ec99f77-1240-4171-83f7-cf9a2c8be8b6"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/xml; charset=utf-8"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 08 Apr 2019 10:14:44 GMT"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "<fault>\n    <code>INVALID_ACCESS_TOKEN</code>\n    <description>The provided access token is invalid</description>\n</fault>"
+				},
+				{
+					"id": "96d48d53-5bbb-4500-a221-5933ac3498c8",
+					"name": "UpdateSubscription-Invalid renewal setting",
+					"originalRequest": {
+						"url": "https://10.236.130.49:8243/rest/ebill/subscription/2.4/subscription/2c92c0f969c8f15e0169de3a564b7c62",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/xml",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<subscription>\r\n\t<accountId>2c92c0f869522d31016952bd83cc5db9</accountId>\r\n\t<autoRenew>true</autoRenew>\r\n\t<contractAcceptanceDate>2015-08-21</contractAcceptanceDate>\r\n\t<contractEffectiveDate>2015-08-21</contractEffectiveDate>\r\n\t<currentTermPeriodType>Month</currentTermPeriodType>\r\n\t<initialTerm>1234</initialTerm>\r\n\t<initialTermPeriodType>Month</initialTermPeriodType>\r\n\t<invoiceOwnerId>2c92c0f869522d31016952bd83cc5db9</invoiceOwnerId>\r\n\t<isInvoiceSeparate>false</isInvoiceSeparate>\r\n\t<name>str1234</name>\r\n\t<notes>testing</notes>\r\n\t<renewalSetting>TERMED</renewalSetting>\r\n\t<renewalTerm>0</renewalTerm>\r\n\t<renewalTermPeriodType>Month</renewalTermPeriodType>\r\n\t<serviceActivationDate>2012-12-13</serviceActivationDate>\r\n\t<termStartDate>2012-12-13</termStartDate>\r\n\t<termType>TERMED</termType>\r\n\t<cpqBundleJsonIdQT>abc</cpqBundleJsonIdQT>\r\n\t<opportunityCloseDateQT>2012-12-13</opportunityCloseDateQT>\r\n\t<opportunityNameQT>abc</opportunityNameQT>\r\n\t<quoteBusinessTypeQT>xyz</quoteBusinessTypeQT>\r\n\t<quoteNumberQT>qwe</quoteNumberQT>\r\n\t<quoteTypeQT>xsw</quoteTypeQT>\r\n\t<orderModifiedBy>Harry</orderModifiedBy>\r\n\t<customerSubscriptionLabel>potter</customerSubscriptionLabel>\r\n\t<orderCreatedBy>joe</orderCreatedBy>\r\n\t<provisioningLastId>2015-09-15</provisioningLastId>\r\n\t<provisioningLastTimestamp>2016-09-13</provisioningLastTimestamp>\r\n\t<provisioningLastResult>Created</provisioningLastResult>\r\n\t<trial>Y</trial>\r\n\t<mailInfoNewSub>new</mailInfoNewSub>\r\n\t<costTypeValue>JHD</costTypeValue>\r\n\t<costType>Project</costType>\r\n\t<solarSite>SOLAR</solarSite>\r\n\t<renewalTriggerInfo2>abc</renewalTriggerInfo2>\r\n\t<renewalTriggerInfo1>abc</renewalTriggerInfo1>\r\n\t<customDateAttribute1>2015-09-15</customDateAttribute1>\r\n\t<customTextAttribute2>abc</customTextAttribute2>\r\n\t<customTextAttribute1>abc</customTextAttribute1>\r\n\t<gateManagerId>abc</gateManagerId>\r\n\t<zuoraContactId2>abc</zuoraContactId2>\r\n\t<customerPaymentReference>abc</customerPaymentReference>\r\n\t<coolOff>abc</coolOff>\r\n\t<nbMW>abc</nbMW>\r\n\t<referenceQuote>abc</referenceQuote>\r\n\t<installerEmail>abc@gmail.com</installerEmail>\r\n\t<sourcePurchase>SourcePurchase</sourcePurchase>\r\n\t<opportunity>abc</opportunity>\r\n\t<entity>FIO</entity>\r\n\t<provisionDate>2015-09-15</provisionDate>\r\n\t<assetSN>asset</assetSN>\r\n\t<assetSKU>assetSKU</assetSKU>\r\n\t<zuoraContactId1>12345</zuoraContactId1>\r\n</subscription>"
+						},
+						"description": ""
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "xml",
+					"_postman_previewtype": "html",
+					"header": [
+						{
+							"key": "zuora-request-id",
+							"value": "47ea56b8-548b-40ab-9866-cd1d2cc30d9a"
+						},
+						{
+							"key": "X-Kong-Upstream-Latency",
+							"value": "76"
+						},
+						{
+							"key": "X-Kong-Proxy-Latency",
+							"value": "0"
+						},
+						{
+							"key": "X-SE-IFW-RequestId",
+							"value": "92ce04cf-b059-4da5-9650-069566c2db66"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/xml; charset=utf-8"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 08 Apr 2019 09:42:01 GMT"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "Close"
+						}
+					],
+					"cookie": [],
+					"body": "<fault>\n    <code>INVALID_VALUE</code>\n    <description>invalid value for field RenewalSetting: TERMED</description>\n</fault>"
+				},
+				{
+					"id": "87cfd346-2cc5-4297-b23a-0e097e48f016",
+					"name": "UpdateSubscription-Invalid InvoiceOwnerid",
+					"originalRequest": {
+						"url": "https://10.236.130.49:8243/rest/ebill/subscription/2.4/subscription/2c92c0f969c8f15e0169de3a564b7c62",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/xml",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<subscription>\r\n\t<accountId>2c92c0f869522d31016952bd83cc5db9</accountId>\r\n\t<autoRenew>true</autoRenew>\r\n\t<contractAcceptanceDate>2015-08-21</contractAcceptanceDate>\r\n\t<contractEffectiveDate>2015-08-21</contractEffectiveDate>\r\n\t<currentTermPeriodType>Month</currentTermPeriodType>\r\n\t<initialTerm>1234</initialTerm>\r\n\t<initialTermPeriodType>Month</initialTermPeriodType>\r\n\t<invoiceOwnerId>str1234</invoiceOwnerId>\r\n\t<isInvoiceSeparate>false</isInvoiceSeparate>\r\n\t<name>str1234</name>\r\n\t<notes>testing</notes>\r\n\t<renewalSetting>TERMED</renewalSetting>\r\n\t<renewalTerm>0</renewalTerm>\r\n\t<renewalTermPeriodType>Month</renewalTermPeriodType>\r\n\t<serviceActivationDate>2012-12-13</serviceActivationDate>\r\n\t<termStartDate>2012-12-13</termStartDate>\r\n\t<termType>TERMED</termType>\r\n\t<cpqBundleJsonIdQT>abc</cpqBundleJsonIdQT>\r\n\t<opportunityCloseDateQT>2012-12-13</opportunityCloseDateQT>\r\n\t<opportunityNameQT>abc</opportunityNameQT>\r\n\t<quoteBusinessTypeQT>xyz</quoteBusinessTypeQT>\r\n\t<quoteNumberQT>qwe</quoteNumberQT>\r\n\t<quoteTypeQT>xsw</quoteTypeQT>\r\n\t<orderModifiedBy>Harry</orderModifiedBy>\r\n\t<customerSubscriptionLabel>potter</customerSubscriptionLabel>\r\n\t<orderCreatedBy>joe</orderCreatedBy>\r\n\t<provisioningLastId>2015-09-15</provisioningLastId>\r\n\t<provisioningLastTimestamp>2016-09-13</provisioningLastTimestamp>\r\n\t<provisioningLastResult>Created</provisioningLastResult>\r\n\t<trial>Y</trial>\r\n\t<mailInfoNewSub>new</mailInfoNewSub>\r\n\t<costTypeValue>JHD</costTypeValue>\r\n\t<costType>Project</costType>\r\n\t<solarSite>SOLAR</solarSite>\r\n\t<renewalTriggerInfo2>abc</renewalTriggerInfo2>\r\n\t<renewalTriggerInfo1>abc</renewalTriggerInfo1>\r\n\t<customDateAttribute1>2015-09-15</customDateAttribute1>\r\n\t<customTextAttribute2>abc</customTextAttribute2>\r\n\t<customTextAttribute1>abc</customTextAttribute1>\r\n\t<gateManagerId>abc</gateManagerId>\r\n\t<zuoraContactId2>abc</zuoraContactId2>\r\n\t<customerPaymentReference>abc</customerPaymentReference>\r\n\t<coolOff>abc</coolOff>\r\n\t<nbMW>abc</nbMW>\r\n\t<referenceQuote>abc</referenceQuote>\r\n\t<installerEmail>abc@gmail.com</installerEmail>\r\n\t<sourcePurchase>SourcePurchase</sourcePurchase>\r\n\t<opportunity>abc</opportunity>\r\n\t<entity>FIO</entity>\r\n\t<provisionDate>2015-09-15</provisionDate>\r\n\t<assetSN>asset</assetSN>\r\n\t<assetSKU>assetSKU</assetSKU>\r\n\t<zuoraContactId1>12345</zuoraContactId1>\r\n</subscription>"
+						},
+						"description": ""
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "xml",
+					"_postman_previewtype": "html",
+					"header": [
+						{
+							"key": "zuora-request-id",
+							"value": "0e6a1cd3-e0e0-45db-b51e-d94532ca670f"
+						},
+						{
+							"key": "X-Kong-Upstream-Latency",
+							"value": "48"
+						},
+						{
+							"key": "X-Kong-Proxy-Latency",
+							"value": "0"
+						},
+						{
+							"key": "X-SE-IFW-RequestId",
+							"value": "23f0e084-2b6f-4262-8ccb-1661a51175fb"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/xml; charset=utf-8"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 08 Apr 2019 09:40:28 GMT"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "Close"
+						}
+					],
+					"cookie": [],
+					"body": "<fault>\n    <code>INVALID_VALUE</code>\n    <description>Invalid value for field InvoiceOwnerId: str1234</description>\n</fault>"
+				},
+				{
+					"id": "5b3ac536-348b-4e80-a93e-26971c474d46",
+					"name": "UpdateSubscription-Invalid account id",
+					"originalRequest": {
+						"url": "https://10.236.130.49:8243/rest/ebill/subscription/2.4/subscription/2c92c0f969c8f15e0169de3a564b7c62",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<subscription>\r\n\t<accountId>12345</accountId>\r\n\t<autoRenew>true</autoRenew>\r\n\t<contractAcceptanceDate>2015-08-21</contractAcceptanceDate>\r\n\t<contractEffectiveDate>2015-08-21</contractEffectiveDate>\r\n\t<currentTermPeriodType>Month</currentTermPeriodType>\r\n\t<initialTerm>1234</initialTerm>\r\n\t<initialTermPeriodType>Month</initialTermPeriodType>\r\n\t<invoiceOwnerId>str1234</invoiceOwnerId>\r\n\t<isInvoiceSeparate>false</isInvoiceSeparate>\r\n\t<name>str1234</name>\r\n\t<notes>testing</notes>\r\n\t<renewalSetting>TERMED</renewalSetting>\r\n\t<renewalTerm>0</renewalTerm>\r\n\t<renewalTermPeriodType>Month</renewalTermPeriodType>\r\n\t<serviceActivationDate>2012-12-13</serviceActivationDate>\r\n\t<termStartDate>2012-12-13</termStartDate>\r\n\t<termType>TERMED</termType>\r\n\t<cpqBundleJsonIdQT>abc</cpqBundleJsonIdQT>\r\n\t<opportunityCloseDateQT>2012-12-13</opportunityCloseDateQT>\r\n\t<opportunityNameQT>abc</opportunityNameQT>\r\n\t<quoteBusinessTypeQT>xyz</quoteBusinessTypeQT>\r\n\t<quoteNumberQT>qwe</quoteNumberQT>\r\n\t<quoteTypeQT>xsw</quoteTypeQT>\r\n\t<orderModifiedBy>Harry</orderModifiedBy>\r\n\t<customerSubscriptionLabel>potter</customerSubscriptionLabel>\r\n\t<orderCreatedBy>joe</orderCreatedBy>\r\n\t<provisioningLastId>2015-09-15</provisioningLastId>\r\n\t<provisioningLastTimestamp>2016-09-13</provisioningLastTimestamp>\r\n\t<provisioningLastResult>Created</provisioningLastResult>\r\n\t<trial>Y</trial>\r\n\t<mailInfoNewSub>new</mailInfoNewSub>\r\n\t<costTypeValue>JHD</costTypeValue>\r\n\t<costType>Project</costType>\r\n\t<solarSite>SOLAR</solarSite>\r\n\t<renewalTriggerInfo2>abc</renewalTriggerInfo2>\r\n\t<renewalTriggerInfo1>abc</renewalTriggerInfo1>\r\n\t<customDateAttribute1>2015-09-15</customDateAttribute1>\r\n\t<customTextAttribute2>abc</customTextAttribute2>\r\n\t<customTextAttribute1>abc</customTextAttribute1>\r\n\t<gateManagerId>abc</gateManagerId>\r\n\t<zuoraContactId2>abc</zuoraContactId2>\r\n\t<customerPaymentReference>abc</customerPaymentReference>\r\n\t<coolOff>abc</coolOff>\r\n\t<nbMW>abc</nbMW>\r\n\t<referenceQuote>abc</referenceQuote>\r\n\t<installerEmail>abc@gmail.com</installerEmail>\r\n\t<sourcePurchase>SourcePurchase</sourcePurchase>\r\n\t<opportunity>abc</opportunity>\r\n\t<entity>FIO</entity>\r\n\t<provisionDate>2015-09-15</provisionDate>\r\n\t<assetSN>asset</assetSN>\r\n\t<assetSKU>assetSKU</assetSKU>\r\n\t<zuoraContactId1>12345</zuoraContactId1>\r\n</subscription>"
+						},
+						"description": ""
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"_postman_previewtype": "html",
+					"header": [
+						{
+							"key": "zuora-request-id",
+							"value": "8744ee2d-4169-490c-828c-b2ee7c594dfb"
+						},
+						{
+							"key": "X-Kong-Upstream-Latency",
+							"value": "49"
+						},
+						{
+							"key": "X-Kong-Proxy-Latency",
+							"value": "0"
+						},
+						{
+							"key": "X-SE-IFW-RequestId",
+							"value": "2861656b-8097-4ec4-a0cc-eb098fea986e"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 08 Apr 2019 09:38:40 GMT"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Connection",
+							"value": "Close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"fault\": {\n        \"code\": \"INVALID_VALUE\",\n        \"description\": \"Invalid value for field AccountId: 12345\"\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "GetSubscription",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"tests[\"Status code name has string\"] = responseCode.name.has(\"OK\");",
+							"",
+							"tests[\"Body matches string\"] = responseBody.has(\"2c92c0f9697a3177016981020ac557f2\");",
+							"",
+							"tests[\"Body matches string\"] = responseBody.has(\"2c92c0f869e31ebd0169ebb5f1767944\");",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "https://10.155.35.19:8243/rest/ebill/subscription/2.4/subscriptions/search",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/xml",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer 6e813ffe29803ffc89e9480a037060f4",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<getSubscriptions>\r\n\t<accountIdentifier>\r\n\t\t<subscription>\r\n\t\t\t<subscriptionIds>\r\n\t\t\t\t<subscriptionId>2c92c0f9697a3177016981020ac557f2</subscriptionId>\r\n\t\t\t\t<status>Cancelled</status>\r\n\t\t\t\t<status>Cancelled</status>\r\n\t\t\t</subscriptionIds>\r\n\t\t\t<subscriptionIds>\r\n\t\t\t\t<subscriptionId>2c92c0f869e31ebd0169ebb5f1767944</subscriptionId>\r\n\t\t\t\t<status>Active</status>\r\n\t\t\t\t<status>Active</status>\r\n\t\t\t</subscriptionIds>\r\n\t\t</subscription>\r\n\t</accountIdentifier>\r\n</getSubscriptions>"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "VC-GetSubscription",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"tests[\"Status code name has string\"] = responseCode.name.has(\"OK\");",
+							"",
+							"tests[\"Body matches string\"] = responseBody.has(\"INVALID_ACCESS_TOKEN\");",
+							"",
+							"tests[\"Body matches string\"] = responseBody.has(\"The provided access token is invalid\");",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "https://10.155.35.19:8243/rest/ebill/subscription/2.4/subscriptions/search",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 6e813ffe29803ffc89e9480a037060f4",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/xml",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "X-SE-IFW-EBILLAccessToken",
+						"value": "00D17000000A1E7!ARwAQAp0ALjoR_.X6Q",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<getSubscriptions>\n\t<accountIdentifier>\n\t\t<subscription>\n\t\t\t<subscriptionIds>\n\t\t\t\t<subscriptionId>2c92c0f9697a3177016981020ac557f3</subscriptionId>\n\t\t\t\t<status>Cancelled</status>\n\t\t\t\t<status>Cancelled</status>\n\t\t\t</subscriptionIds>\n\t\t\t<subscriptionIds>\n\t\t\t\t<subscriptionId>2c92c0f869e31ebd0169ebb5f176794</subscriptionId>\n\t\t\t\t<status>Active</status>\n\t\t\t\t<status>Active</status>\n\t\t\t</subscriptionIds>\n\t\t</subscription>\n\t</accountIdentifier>\n</getSubscriptions>"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "VC1-GetSubscription",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"tests[\"Status code name has string\"] = responseCode.name.has(\"Bad Request\");",
+							"",
+							"tests[\"Body matches string\"] = responseBody.has(\"BAD_REQUEST\");",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "https://10.155.35.19:8243/rest/ebill/subscription/2.4/subscriptions/search",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer 6e813ffe29803ffc89e9480a037060f4"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/xml"
+					},
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "X-SE-IFW-EBILLAccessToken",
+						"type": "text",
+						"value": "00D17000000A1E7!ARwAQAp0ALjoR_.X6Q"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<getSubscriptions>\n\t<accountIdentifier>\n\t\t<subscription1>\n\t\t\t<subscriptionIds>\n\t\t\t\t<subscriptionId>2c92c0f9697a3177016981020ac557f3</subscriptionId>\n\t\t\t\t<status>Cancelled</status>\n\t\t\t\t<status>Cancelled</status>\n\t\t\t</subscriptionIds>\n\t\t\t<subscriptionIds>\n\t\t\t\t<subscriptionId>2c92c0f869e31ebd0169ebb5f176794</subscriptionId>\n\t\t\t\t<status>Active</status>\n\t\t\t\t<status>Active</status>\n\t\t\t</subscriptionIds>\n\t\t</subscription1>\n\t</accountIdentifier>\n</getSubscriptions>"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Postpone Subscription",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"",
+							"",
+							"tests[\"Body matches string\"] = responseBody.has(\"subscriptionId\");",
+							"",
+							"",
+							"",
+							"tests[\"Status code is 200\"] = responseCode.code === 200;",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "https://10.155.35.19:8243/rest/ebill/subscription/2.4/subscriptions/postpone/A-S00017887",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 6e813ffe29803ffc89e9480a037060f4",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/xml",
+						"description": ""
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "X-SE-IFW-EBILLAccessToken",
+						"value": "00D17000000A1E7!ARwAQAp0ALjoR_.X6Q",
+						"description": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<subscription>\n<subscriptionPostponeDate>2019-08-24</subscriptionPostponeDate>\n<requestDate>2019-08-24</requestDate>\n</subscription>"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Vc1-ValiadtionPostpone Subscription",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"",
+							"tests[\"Status code name has string\"] = responseCode.name.has(\"Bad Request\");",
+							"",
+							"tests[\"Body matches string\"] = responseBody.has(\"BAD_REQUEST\");",
+							"",
+							"",
+							"",
+							"",
+							"tests[\"Status code is 400\"] = responseCode.code === 400;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "https://10.155.35.19:8243/rest/ebill/subscription/2.4/subscriptions/postpone/A-S00017887",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 6e813ffe29803ffc89e9480a037060f4",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/xml",
+						"description": ""
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "X-SE-IFW-EBILLAccessToken",
+						"value": "00D17000000A1E7!ARwAQAp0ALjoR_.X6Q",
+						"description": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<subscription>\n<subscriptionPostponeDate>2019-08-24</subscriptionPostponeDate>\n<requestDate/>\n</subscription>"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Vc2-ValiadtionPostpone Subscription",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"tests[\"Status code name has string\"] = responseCode.name.has(\"Conflict\");",
+							"",
+							"",
+							"",
+							"",
+							"tests[\"Status code is 409\"] = responseCode.code === 409;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "https://10.155.35.19:8243/rest/ebill/subscription/2.4/subscriptions/postpone/A-S00017876",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 6e813ffe29803ffc89e9480a037060f4",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/xml",
+						"description": ""
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "X-SE-IFW-EBILLAccessToken",
+						"value": "00D17000000A1E7!ARwAQAp0ALjoR_.X6Q",
+						"description": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<subscription>\n<subscriptionPostponeDate>2019-08-24</subscriptionPostponeDate>\n<requestDate>2019-08-24</requestDate>\n</subscription>"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
